@@ -36,7 +36,7 @@ option(BUILD_SHARED_LIBS "" ON)
 
 option(glew-cmake_BUILD_MULTI_CONTEXT "" OFF)
 option(glew-cmake_BUILD_SHARED "" ON)
-option(glew-cmake_BUILD_SINGLE_CONTEXT "" OFF)
+option(glew-cmake_BUILD_SINGLE_CONTEXT "" ON)
 option(glew-cmake_BUILD_STATIC "" OFF)
 
 download_project(PROJ       glfw
@@ -53,8 +53,9 @@ download_project(PROJ       glew
         CMAKE_SUBDIR    /build/cmake
         ${UPDATE_DISCONNECTED_IF_AVAILABLE}
         )
-add_subdirectory(${glew_SOURCE_DIR}/build/cmake ${glew_BINARY_DIR})
+add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
 include_directories("${glew_SOURCE_DIR}/include")
+#set_property(DIRECTORY "${glew_SOURCE_DIR}/include" PROPERTY LANGUAGE CXX)
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 
@@ -67,4 +68,11 @@ else()
     message("OPENGL NOT FOUND")
 endif()
 
-target_link_libraries(enu_graphics_framework glfw3dll glew)
+target_link_libraries(enu_graphics_framework glfw3dll optimized libglew_shared debug libglew_sharedd)
+set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
+add_dependencies(enu_graphics_framework libglew_shared glfw)
+
+#get_property(FLAGS TARGET glew PROPERTY COMPILE_DEFINITIONS)
+#message(WARNING ${FLAGS})
+#string(REPLACE "-fname" "" FLAGS ${FLAGS})
+#set_property(TARGET glew PROPERTY LANGUAGE CXX)
