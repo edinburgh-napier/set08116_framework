@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.3)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 project(enu_graphics_framework)
-
-SET(OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+SET(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
 foreach (config ${CMAKE_CONFIGURATION_TYPES})
     string (TOUPPER ${config} config)
@@ -20,7 +19,7 @@ foreach (config ${CMAKE_CONFIGURATION_TYPES})
     SET( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
     SET( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
     SET( VS_INTERMEDIATE_DIRECTORY_${config} "temp/${config}")
-
+	link_directories("${OUTPUT_DIRECTORY}/${config}")
 endforeach ()
 
 
@@ -32,20 +31,30 @@ option(GLFW_BUILD_TESTS "" OFF)
 option(GLFW_DOCUMENT_INTERNALS "" OFF)
 option(GLFW_INSTALL "" OFF)
 
+option(BUILD_UTILS "" OFF)
+option(BUILD_SHARED_LIBS "" ON)
+
+option(glew-cmake_BUILD_MULTI_CONTEXT "" OFF)
+option(glew-cmake_BUILD_SHARED "" ON)
+option(glew-cmake_BUILD_SINGLE_CONTEXT "" OFF)
+option(glew-cmake_BUILD_STATIC "" OFF)
+
 download_project(PROJ       glfw
         GIT_REPOSITORY      https://github.com/glfw/glfw.git
         GIT_TAG             master
         ${UPDATE_DISCONNECTED_IF_AVAILABLE}
         )
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
+include_directories("${glfw_SOURCE_DIR}/include")
 
-#download_project(PROJ       glew
-#        GIT_REPOSITORY      https://github.com/nigels-com/glew.git
-#        GIT_TAG             master
-#        CMAKE_SUBDIR    /build/cmake
-#        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-#        )
-#ßadd_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
+download_project(PROJ       glew
+        GIT_REPOSITORY      https://github.com/Perlmint/glew-cmake.git
+        GIT_TAG             master
+        CMAKE_SUBDIR    /build/cmake
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
+add_subdirectory(${glew_SOURCE_DIR}/build/cmake ${glew_BINARY_DIR})
+include_directories("${glew_SOURCE_DIR}/include")
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 
@@ -58,4 +67,4 @@ else()
     message("OPENGL NOT FOUND")
 endif()
 
-target_link_libraries(enu_graphics_framework glfw )
+target_link_libraries(enu_graphics_framework glfw3dll glew)
