@@ -22,7 +22,6 @@ foreach (config ${CMAKE_CONFIGURATION_TYPES})
 	link_directories("${OUTPUT_DIRECTORY}/${config}")
 endforeach ()
 
-
 include(DownloadProject.cmake)
 
 option(GLFW_BUILD_DOCS "" OFF)
@@ -39,6 +38,12 @@ option(glew-cmake_BUILD_SHARED "" ON)
 option(glew-cmake_BUILD_SINGLE_CONTEXT "" ON)
 option(glew-cmake_BUILD_STATIC "" OFF)
 
+option(GLM_DYNAMIC_LIBRARY_ENABLE "" OFF)
+option(GLM_TEST_ENABLE_FAST_MATH "" ON)
+option(GLM_TEST_ENABLE_LANG_EXTENSIONS "" ON)
+option(GLM_TEST_ENABLE_SIMD_AVX2 "" ON)
+option(GLM_TEST_ENABLE_SIMD_SSE3 "" ON)
+
 download_project(PROJ       glfw
         GIT_REPOSITORY      https://github.com/glfw/glfw.git
         GIT_TAG             master
@@ -50,12 +55,19 @@ include_directories("${glfw_SOURCE_DIR}/include")
 download_project(PROJ       glew
         GIT_REPOSITORY      https://github.com/Perlmint/glew-cmake.git
         GIT_TAG             master
-        CMAKE_SUBDIR    /build/cmake
         ${UPDATE_DISCONNECTED_IF_AVAILABLE}
         )
 add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
 include_directories("${glew_SOURCE_DIR}/include")
-#set_property(DIRECTORY "${glew_SOURCE_DIR}/include" PROPERTY LANGUAGE CXX)
+
+download_project(PROJ       glm
+        GIT_REPOSITORY      https://github.com/g-truc/glm.git
+        GIT_TAG             master
+        ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+        )
+add_subdirectory(${glm_SOURCE_DIR} ${glm_BINARY_DIR})
+include_directories("${glm_SOURCE_DIR}")
+
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 
@@ -70,9 +82,4 @@ endif()
 
 target_link_libraries(enu_graphics_framework glfw3dll optimized libglew_shared debug libglew_sharedd)
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
-add_dependencies(enu_graphics_framework libglew_shared glfw)
-
-#get_property(FLAGS TARGET glew PROPERTY COMPILE_DEFINITIONS)
-#message(WARNING ${FLAGS})
-#string(REPLACE "-fname" "" FLAGS ${FLAGS})
-#set_property(TARGET glew PROPERTY LANGUAGE CXX)
+add_dependencies(enu_graphics_framework libglew_shared glfw glm)
