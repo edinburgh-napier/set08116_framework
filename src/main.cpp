@@ -1,53 +1,96 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm/geometric.hpp> // glm::cross, glm::normalize
-#include <glm/vec3.hpp>      // glm::vec3
-#include <iostream>
+#include "graphics_framework.h"
+#include <glm\glm.hpp>
 
 using namespace std;
+using namespace graphics_framework;
+using namespace glm;
 
-int main() {
-  cout << "Hello, World!" << endl;
+geometry geom;
+effect eff;
+target_camera cam;
+float theta = 0.0f;
 
-  GLFWwindow *window;
+bool load_content()
+{
+	// Create triangle data
+	// Positions
+	vector<vec3> positions
+	{
+		vec3(0.0f, 1.0f, 0.0f),
+		vec3(-1.0f, -1.0f, 0.0f),
+		vec3(1.0f, -1.0f, 0.0f)
+	};
+	// Colours
+	vector<vec4> colours
+	{
+		vec4(1.0f, 0.0f, 0.0f, 1.0f),
+		vec4(1.0f, 0.0f, 0.0f, 1.0f),
+		vec4(1.0f, 0.0f, 0.0f, 1.0f)
+	};
+	// Add to the geometry
+	geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
+	geom.add_buffer(colours, BUFFER_INDEXES::COLOUR_BUFFER);
 
-  /* Initialize the library */
-  if (!glfwInit())
-    return -1;
+	// Load in shaders
+	eff.add_shader(
+		"shaders/basic.vert", // filename
+		GL_VERTEX_SHADER); // type
+	eff.add_shader(
+		"shaders/basic.frag", // filename
+		GL_FRAGMENT_SHADER); // type
+							 // Build effect
+	eff.build();
 
-  /* Create a windowed mode window and its OpenGL context */
-  window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-  if (!window) {
-    glfwTerminate();
-    return -1;
-  }
+	// Set camera properties
+	cam.set_position(vec3(10.0f, 10.0f, 10.0f));
+	cam.set_target(vec3(0.0f, 0.0f, 0.0f));
+	auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
+	cam.set_projection(quarter_pi<float>(), aspect, 2.414f, 1000.0f);
+	return true;
+}
 
-  /* Make the window's context current */
-  glfwMakeContextCurrent(window);
+bool update(float delta_time)
+{
+	// Update the angle - half rotation per second
+	theta += pi<float>() * delta_time;
+	// Update the camera
+	cam.update(delta_time);
+	return true;
+}
 
-  GLenum err = glewInit();
-  if (GLEW_OK != err) {
-    /* Problem: glewInit failed, something is seriously wrong. */
-    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-    return -1;
-  }
+bool render()
+{
+	// Bind effect
+	renderer::bind(eff);
+	// Create MVP matrix
+	// ******************************************************
+	// Create rotation matrix - rotate around Z axis by theta
+	// ******************************************************
+	mat4 R;
+	R = rotate(mat4(1.0f), theta, vec3(0.0f, 0.0f, 1.0f));
+	mat4 M = R;
+	auto V = cam.get_view();
+	auto P = cam.get_projection();
+	auto MVP = P * V * M;
+	// Set MVP matrix uniform
+	glUniformMatrix4fv(
+		eff.get_uniform_location("MVP"), // Location of uniform
+		1, // Number of values - 1 mat4
+		GL_FALSE, // Transpose the matrix?
+		value_ptr(MVP)); // Pointer to matrix data
+						 // Render geometry
+	renderer::render(geom);
+	return true;
+}
 
-  /* Loop until the user closes the window */
-  while (!glfwWindowShouldClose(window)) {
-    auto const &a = glm::vec3(rand(), rand(), rand());
-    auto const &b = glm::vec3(rand(), rand(), rand());
-    auto const &c = glm::vec3(rand(), rand(), rand());
-    auto const Normal = glm::normalize(glm::cross(c - a, b - a));
-    /* Render here */
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    /* Swap front and back buffers */
-    glfwSwapBuffers(window);
-
-    /* Poll for and process events */
-    glfwPollEvents();
-  }
-
-  glfwTerminate();
-  return 0;
+void main()
+{
+	// Create application
+	app application;
+	// Set load content, update and render methods
+	application.set_load_content(load_content);
+	application.set_update(update);
+	application.set_render(render);
+	// Run application
+	application.run();
 }
