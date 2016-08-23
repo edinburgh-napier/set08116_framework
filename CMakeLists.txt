@@ -22,6 +22,8 @@ foreach (config ${CMAKE_CONFIGURATION_TYPES})
   link_directories("${OUTPUT_DIRECTORY}/${config}")
 endforeach ()
 
+option(ENU_GFX_TEST "MyOption" OFF)
+
 include(DownloadProject.cmake)
 #GLFW options
 option(GLFW_BUILD_DOCS "" OFF)
@@ -89,8 +91,19 @@ include_directories("${assimp_SOURCE_DIR}/include")
 
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
-
+if(ENU_GFX_TEST)
 add_executable(enu_graphics_framework ${SOURCE_FILES})
+else()
+list(REMOVE_ITEM SOURCE_FILES "src/main.cpp")
+include (GenerateExportHeader)
+add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
+GENERATE_EXPORT_HEADER( enu_graphics_framework
+             BASE_NAME enu_graphics_framework
+             EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
+             EXPORT_FILE_NAME enu_graphics_framework_Export.h
+             STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
+)
+endif()
 
 FIND_PACKAGE( OpenGL REQUIRED)
 if(${OPENGL_FOUND})
