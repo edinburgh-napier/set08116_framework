@@ -120,6 +120,10 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
 target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
+
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
+
 if(${MSVC})
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/enu_graphics_framework.vcxproj.user" 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>     \
