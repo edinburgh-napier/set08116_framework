@@ -4,6 +4,9 @@
 #include "util.h"
 
 namespace graphics_framework {
+float renderer::_clear_r;
+float renderer::_clear_g;
+float renderer::_clear_b;
 // Initialise the renderer singleton
 renderer *renderer::_instance = nullptr;
 
