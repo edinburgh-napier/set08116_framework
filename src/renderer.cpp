@@ -648,5 +648,6 @@ void renderer::setClearColour(const float r, const float g, const float b) {
   _clear_r = r;
   _clear_g = g;
   _clear_b = b;
+  glClearColor(_clear_r, _clear_g, _clear_b, 1.0f);
 }
 }
