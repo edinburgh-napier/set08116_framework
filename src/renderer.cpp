@@ -20,6 +20,9 @@ void build_content() {}
 
 // Initialises the renderer
 bool renderer::initialise() {
+  renderer::_clear_r = 0.0f;
+  renderer::_clear_g = 1.0f;
+  renderer::_clear_b = 1.0f;
   // Set running to false
   _instance->_running = false;
 
@@ -91,7 +94,7 @@ bool renderer::initialise() {
 #endif
 
   // Set clear colour to cyan
-  glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+  glClearColor(_clear_r, _clear_g, _clear_b, 1.0f);
 
   // Enable textures
   glEnable(GL_TEXTURE_1D);
@@ -636,5 +639,11 @@ void renderer::set_render_target(const frame_buffer &frame) throw(...) {
     // Throw exception
     throw std::runtime_error("Error setting render target");
   }
+}
+
+void renderer::setClearColour(const float r, const float g, const float b) {
+  _clear_r = r;
+  _clear_g = g;
+  _clear_b = b;
 }
 }
