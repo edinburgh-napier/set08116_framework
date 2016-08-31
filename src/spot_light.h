@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glm\glm.hpp>
-#include <glm\gtc\quaternion.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace graphics_framework {
 // An object representing spot light data
@@ -50,7 +50,7 @@ public:
   // Gets the constant factor of the light attenuation
   float get_constant_attenuation() const { return _constant; }
   // Sets the constant factor of the light attenuation
-  float set_constant_attenuation(float value) { _constant = value; }
+  void set_constant_attenuation(float value) { _constant = value; }
   // Gets the linear factor of the light attenuation
   float get_linear_attenuation() const { return _linear; }
   // Sets the linear factor of the light attenuation

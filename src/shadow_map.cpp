@@ -1,5 +1,3 @@
-#pragma once
-
 #include "shadow_map.h"
 #include "stdafx.h"
 

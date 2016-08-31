@@ -63,7 +63,7 @@ depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...) : _width(widt
     // Delete frame buffer
     glDeleteFramebuffers(1, &_buffer);
     // Throw exception
-    throw std::exception("Error creating depth buffer with OpenGL");
+    throw std::runtime_error("Error creating depth buffer with OpenGL");
   }
 
   // Set draw buffer
@@ -77,7 +77,7 @@ depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...) : _width(widt
     // Delete frame buffer
     glDeleteFramebuffers(1, &_buffer);
     // Throw exception
-    throw std::exception("Error creating depth buffer with OpenGL");
+    throw std::runtime_error("Error creating depth buffer with OpenGL");
   }
 
   // Unbind frame buffer

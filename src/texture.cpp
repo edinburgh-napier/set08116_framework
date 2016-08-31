@@ -149,7 +149,7 @@ texture::texture(const std::vector<glm::vec4> &data, GLuint width, GLuint height
   }
 
   // Determine type of texture by height
-  if (height = 1) {
+  if (height == 1) {
     // 1D texture
     glBindTexture(GL_TEXTURE_1D, _id);
     // Set parameters

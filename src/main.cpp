@@ -1,5 +1,5 @@
 #include "graphics_framework.h"
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
 
 using namespace std;
 using namespace graphics_framework;
@@ -83,7 +83,7 @@ bool render()
 	return true;
 }
 
-void main()
+int main()
 {
 	// Create application
 	app application;
@@ -93,4 +93,5 @@ void main()
 	application.set_render(render);
 	// Run application
 	application.run();
+	return 0;
 }
