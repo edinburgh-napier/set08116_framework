@@ -89,6 +89,7 @@ include_directories("${assimp_SOURCE_DIR}/include")
 #add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
 #include_directories("${devil_SOURCE_DIR}/include")
 
+link_directories("${glew_BINARY_DIR}/../lib/")
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 if(ENU_GFX_TEST)
@@ -117,7 +118,14 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
         "${PROJECT_SOURCE_DIR}/res"      # <--this is in-file
         $<TARGET_FILE_DIR:enu_graphics_framework>)                 # <--this is out-file path
 
+if(${MSVC})
 target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
+else()
+  #libglewd.dylib
+  #libglfw.dylib
+
+  target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
+endif()
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
 

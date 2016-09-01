@@ -29,6 +29,7 @@ bool renderer::initialise() {
   // Set running to false
   _instance->_running = false;
 
+      glewExperimental = GL_TRUE;
   // Try and initialise GLFW
   if (!glfwInit()) {
     // Display error
@@ -45,9 +46,21 @@ bool renderer::initialise() {
   // Set window hints for GLFW
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_DECORATED, GL_FALSE);
-  glfwWindowHint(GLFW_SAMPLES, 4);
-  glfwWindowHint(GLFW_VERSION_MAJOR, 4);
-  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+  glfwWindowHint(GLFW_SAMPLES, 2);
+
+        glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 1);
+        glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+        glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+
+
+ // glfwWindowHint(GLFW_VERSION_MAJOR, 2);
+   //     glfwWindowHint(GLFW_VERSION_MINOR, 1);
+
+     //   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+       // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 // If in debug mode, set window dimensions to 800 x 600
 #if defined(DEBUG) | defined(_DEBUG)

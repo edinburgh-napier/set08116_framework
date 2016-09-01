@@ -120,7 +120,7 @@ function(download_project)
     # Ensure the caller can know where to find the source and build directories
     if (NOT DL_ARGS_SOURCE_DIR)
         set(DL_ARGS_SOURCE_DIR "${DL_ARGS_PREFIX}/${DL_ARGS_PROJ}-src")
-        message(WARNING ${DL_ARGS_SOURCE_DIR}})
+        #message(WARNING ${DL_ARGS_SOURCE_DIR}})
     endif()
     if (NOT DL_ARGS_BINARY_DIR)
         set(DL_ARGS_BINARY_DIR "${DL_ARGS_PREFIX}/${DL_ARGS_PROJ}-build")

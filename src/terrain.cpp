@@ -99,10 +99,10 @@ terrain::terrain(const std::string &heightmap) : terrain() {
   for (unsigned int x = 0; x < tex.get_width(); ++x) {
     for (unsigned int z = 0; z < tex.get_height(); ++z) {
       // Calculate tex weight
-      glm::vec4 tex_weight(glm::clamp(1.0f - abs(data[(tex.get_width() * z) + x].y - 0.0f) / 0.25f, 0.0f, 1.0f),
-                           glm::clamp(1.0f - abs(data[(tex.get_width() * z) + x].y - 0.15f) / 0.25f, 0.0f, 1.0f),
-                           glm::clamp(1.0f - abs(data[(tex.get_width() * z) + x].y - 0.5f) / 0.25f, 0.0f, 1.0f),
-                           glm::clamp(1.0f - abs(data[(tex.get_width() * z) + x].y - 0.9f) / 0.25f, 0.0f, 1.0f));
+      glm::vec4 tex_weight(glm::clamp(1.0f - std::abs(data[(tex.get_width() * z) + x].y - 0.0f) / 0.25f, 0.0f, 1.0f),
+                           glm::clamp(1.0f - std::abs(data[(tex.get_width() * z) + x].y - 0.15f) / 0.25f, 0.0f, 1.0f),
+                           glm::clamp(1.0f - std::abs(data[(tex.get_width() * z) + x].y - 0.5f) / 0.25f, 0.0f, 1.0f),
+                           glm::clamp(1.0f - std::abs(data[(tex.get_width() * z) + x].y - 0.9f) / 0.25f, 0.0f, 1.0f));
 
       // Sum the components of the vector
       auto total = tex_weight.x + tex_weight.y + tex_weight.z + tex_weight.w;
