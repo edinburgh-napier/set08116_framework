@@ -41,9 +41,10 @@ private:
   // Copy constructor and assignment operator deleted
   renderer(const renderer &) = delete;
   void operator=(renderer &) = delete;
-  float static _clear_r; 
-  float static _clear_g;  
+  float static _clear_r;
+  float static _clear_g;
   float static _clear_b;
+
 public:
   // Destroys the renderer object.  Calls shutdown
   ~renderer() { shutdown(); }
@@ -101,7 +102,7 @@ public:
   static void set_render_target(const depth_buffer &depth) throw(...);
   // Sets the render target of the renderer to a frame buffer
   static void set_render_target(const frame_buffer &frame) throw(...);
-  
+
   static void setClearColour(const float r, const float g, const float b);
 };
 }

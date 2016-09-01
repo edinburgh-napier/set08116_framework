@@ -29,7 +29,7 @@ bool renderer::initialise() {
   // Set running to false
   _instance->_running = false;
 
-      glewExperimental = GL_TRUE;
+  glewExperimental = GL_TRUE;
   // Try and initialise GLFW
   if (!glfwInit()) {
     // Display error
@@ -46,21 +46,13 @@ bool renderer::initialise() {
   // Set window hints for GLFW
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
   glfwWindowHint(GLFW_DECORATED, GL_FALSE);
-  glfwWindowHint(GLFW_SAMPLES, 2);
+  glfwWindowHint(GLFW_SAMPLES, 4);
 
-        glfwWindowHint (GLFW_CONTEXT_VERSION_MAJOR, 4);
-        glfwWindowHint (GLFW_CONTEXT_VERSION_MINOR, 1);
-        glfwWindowHint (GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        glfwWindowHint (GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-
-
- // glfwWindowHint(GLFW_VERSION_MAJOR, 2);
-   //     glfwWindowHint(GLFW_VERSION_MINOR, 1);
-
-     //   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-       // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  //glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+  glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 // If in debug mode, set window dimensions to 800 x 600
 #if defined(DEBUG) | defined(_DEBUG)
@@ -112,11 +104,6 @@ bool renderer::initialise() {
   // Set clear colour to cyan
   glClearColor(_clear_r, _clear_g, _clear_b, 1.0f);
 
-  // Enable textures
-  glEnable(GL_TEXTURE_1D);
-  glEnable(GL_TEXTURE_2D);
-  glEnable(GL_TEXTURE_CUBE_MAP);
-
   // Check for any errors
   if (CHECK_GL_ERROR) {
     // Display error - not fatal
@@ -159,7 +146,6 @@ bool renderer::initialise() {
   // Enable smoothing
   glEnable(GL_LINE_SMOOTH);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-  glEnable(GL_POINT_SMOOTH);
   glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
   glEnable(GL_MULTISAMPLE);
 
