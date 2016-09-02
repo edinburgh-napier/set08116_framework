@@ -6,6 +6,7 @@ using namespace graphics_framework;
 using namespace glm;
 
 geometry geom;
+geometry geom2;
 effect eff;
 target_camera cam;
 float theta = 0.0f;
@@ -19,6 +20,8 @@ bool load_content() {
   // Add to the geometry
   geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
   geom.add_buffer(colours, BUFFER_INDEXES::COLOUR_BUFFER);
+
+  geom2 = geometry_builder::create_box();
 
   // Load in shaders
   eff.add_shader("shaders/basic.vert", // filename
@@ -64,6 +67,7 @@ bool render() {
                      value_ptr(MVP));                 // Pointer to matrix data
                                                       // Render geometry
   renderer::render(geom);
+  renderer::render(geom2);
   return true;
 }
 

@@ -31,30 +31,48 @@ void generate_tb(geometry &geom, const std::vector<glm::vec3> &normals) {
 }
 
 // Data required for box geometry
-glm::vec3 box_positions[24] = {
-    // Front
-    glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, -0.5f, 0.5f),
-    glm::vec3(0.5f, -0.5f, 0.5f),
+glm::vec3 box_positions[] = {
+    //   G-----H
+    //  /|    /|
+    // A-----B |
+    // | E---|-F
+    // |/    |/
+    // c-----D
+    glm::vec3(-0.5f, 0.5f, -0.5f),  // a -0
+    glm::vec3(0.5f, 0.5f, -0.5f),   // b - 1
+    glm::vec3(-0.5f, -0.5f, -0.5f), // c - 2
+    glm::vec3(0.5f, -0.5f, -0.5f),  // d - 3
 
-    // Right side
-    glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, -0.5f, 0.5f),
-    glm::vec3(0.5f, -0.5f, -0.5f),
-
-    // Back
-    glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(0.5f, -0.5f, -0.5f),
-    glm::vec3(-0.5f, -0.5f, -0.5f),
-
-    // Left side
-    glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, -0.5f, -0.5f),
-    glm::vec3(-0.5f, -0.5f, 0.5f),
-
-    // Top
-    glm::vec3(0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, 0.5f),
-    glm::vec3(0.5f, 0.5f, 0.5f),
-
-    // Bottom
-    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, -0.5f, -0.5f), glm::vec3(0.5f, -0.5f, 0.5f),
-    glm::vec3(-0.5f, -0.5f, 0.5f)};
+    glm::vec3(-0.5f, 0.5f, 0.5f),  // g - 4
+    glm::vec3(0.5f, 0.5f, 0.5f),   // h - 5
+    glm::vec3(-0.5f, -0.5f, 0.5f), // e - 6
+    glm::vec3(0.5f, -0.5f, 0.5f),  // f - 7
+};
+int box_indices[] = {
+    // front ABC
+    0, 1, 2,
+    // BDC
+    1, 3, 2,
+    // bottom CDE
+    2, 3, 6,
+    // DFE
+    3, 7, 6,
+    // back EFG
+    6, 7, 4,
+    // FHG
+    7, 5, 4,
+    // top GHA
+    4, 5, 0,
+    // HBA
+    5, 1, 0,
+    // left GAE
+    4, 0, 6,
+    // ACE
+    0, 2, 6,
+    // rightBHD
+    1, 5, 3,
+    // HFD
+    5, 7, 3};
 
 // Normals for the box geometry
 glm::vec3 box_normals[6] = {glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
@@ -72,17 +90,18 @@ geometry geometry_builder::create_box(const glm::vec3 &dims) {
 
   // Type of geometry generated will be quads
   geometry geom;
-  geom.set_type(GL_QUADS);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  geom.set_type(GL_TRIANGLES);
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
   std::vector<glm::vec4> colours;
 
   // Iterate through each position and add to buffer
-  for (unsigned int i = 0; i < 24; ++i) {
+  for (unsigned int i = 0; i < 36; ++i) {
     // Calculate position
-    glm::vec3 pos = box_positions[i] * dims;
+    glm::vec3 pos = box_positions[box_indices[i]] * dims;
     // Add the position data.  Multiply by dimension
     positions.push_back(pos);
     // Recalculate minimal and maximal
@@ -151,7 +170,8 @@ geometry geometry_builder::create_tetrahedron(const glm::vec3 &dims) {
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
@@ -231,7 +251,8 @@ geometry geometry_builder::create_pyramid(const glm::vec3 &dims) {
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
@@ -300,7 +321,8 @@ geometry geometry_builder::create_disk(const unsigned int slices, const glm::vec
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLE_FAN);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
@@ -368,7 +390,8 @@ geometry geometry_builder::create_cylinder(const unsigned int stacks, const unsi
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
@@ -541,7 +564,8 @@ geometry geometry_builder::create_sphere(const unsigned int stacks, const unsign
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
@@ -642,7 +666,8 @@ geometry geometry_builder::create_torus(const unsigned int stacks, const unsigne
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
@@ -754,7 +779,8 @@ geometry geometry_builder::create_plane(const unsigned int width, const unsigned
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
-  // Declare required buffers - positions, normals, texture coordinates and colour
+  // Declare required buffers - positions, normals, texture coordinates and
+  // colour
   std::vector<glm::vec3> positions;
   std::vector<glm::vec3> normals;
   std::vector<glm::vec2> tex_coords;
