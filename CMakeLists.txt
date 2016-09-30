@@ -73,13 +73,13 @@ download_project(PROJ glm
 add_subdirectory(${glm_SOURCE_DIR} ${glm_BINARY_DIR})
 include_directories("${glm_SOURCE_DIR}")
 
-download_project(PROJ assimp
-  GIT_REPOSITORY      https://github.com/assimp/assimp
-  GIT_TAG             master
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
-include_directories("${assimp_SOURCE_DIR}/include")
+#download_project(PROJ assimp
+#  GIT_REPOSITORY      https://github.com/assimp/assimp
+#  GIT_TAG             master
+#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+#)
+#add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
+#include_directories("${assimp_SOURCE_DIR}/include")
 
 #download_project(PROJ devil
 #  GIT_REPOSITORY      https://github.com/DentonW/DevIL
@@ -119,16 +119,18 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
         $<TARGET_FILE_DIR:enu_graphics_framework>)                 # <--this is out-file path
 
 if(${MSVC})
-target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
+#target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
+target_link_libraries(enu_graphics_framework glfw3dll optimized libglew_shared debug libglew_sharedd)
 else()
   #libglewd.dylib
   #libglfw.dylib
 
-  target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
+  #target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
+  target_link_libraries(enu_graphics_framework glfw optimized glew_shared debug glewd)
 endif()
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
-add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
-
+#add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
+add_dependencies(enu_graphics_framework libglew_shared glfw glm)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 
