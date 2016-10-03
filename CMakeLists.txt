@@ -119,6 +119,7 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
         $<TARGET_FILE_DIR:enu_graphics_framework>)                 # <--this is out-file path
 
 if(${MSVC})
+target_compile_options(enu_graphics_framework PUBLIC /MP)
 #target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
 target_link_libraries(enu_graphics_framework glfw3dll optimized libglew_shared debug libglew_sharedd)
 else()
@@ -136,14 +137,14 @@ set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 
 if(${MSVC})
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/enu_graphics_framework.vcxproj.user" 
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>     \
+    "<?xml version=\"1.0\" encoding=\"utf-8\"?>
     <Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
     <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">
-        <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+        <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
         <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     </PropertyGroup>
     <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">
-        <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+        <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
         <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     </PropertyGroup>
     </Project>")
