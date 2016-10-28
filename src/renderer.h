@@ -70,6 +70,8 @@ public:
   static void clear();
   // Swaps the screen buffers
   static void swap_buffers();
+  // enalbe or disable vertical sync
+  static void toggle_vsync(const bool toggle);
   // Shuts down the renderer
   static void shutdown();
   // Binds an effect with the renderer

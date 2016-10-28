@@ -261,6 +261,8 @@ void renderer::swap_buffers() {
   glfwSwapBuffers(_instance->_window);
 }
 
+void renderer::toggle_vsync(const bool toggle) { glfwSwapInterval((int)toggle); }
+
 // Shuts down the renderer
 void renderer::shutdown() {
   // Log
