@@ -14,6 +14,7 @@
 #define GLFW_INCLUDE_GLU
 #define GLFW_DLL 1
 #define GLM_FORCE_RADIANS
+#define GLM_ENABLE_EXPERIMENTAL
 
 #if !(defined(DEBUG) | defined(_DEBUG))
 #define NDEBUG
