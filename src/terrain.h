@@ -20,7 +20,7 @@ public:
   // Creates a terrain object
   terrain() {}
   // Creates a terrain object from the given heightmap file
-  terrain(const std::string &heightmap);
+  explicit terrain(const std::string &heightmap);
   // Default copy constructor and assignment operator
   terrain(const terrain &other) = default;
   terrain &operator=(const terrain &rhs) = default;

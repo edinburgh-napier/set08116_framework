@@ -5,13 +5,10 @@
 //#include <FreeImage\FreeImage.h>
 
 namespace graphics_framework {
-frame_buffer::frame_buffer(GLuint width, GLuint height) throw(...) : _width(width), _height(height) {
+frame_buffer::frame_buffer(GLuint width, GLuint height) throw(...)
+    : _width(width), _height(height), _frame(texture(width, height)), _depth(texture(width, height)) {
   // The draw buffer
   static GLenum draw_buffer = GL_COLOR_ATTACHMENT0;
-
-  // Create textures with OpenGL
-  _frame = texture(width, height);
-  _depth = texture(width, height);
 
   // Bind image with OpenGL
   glActiveTexture(GL_TEXTURE0);

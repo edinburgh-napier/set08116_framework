@@ -23,7 +23,7 @@ public:
   // Creates an empty texture of the given width and height
   texture(GLuint width, GLuint height) throw(...);
   // Loads a texture from the given filename
-  texture(const std::string &filename) throw(...);
+  explicit texture(const std::string &filename) throw(...);
   /*
   Loads a texture from the given filename with mipmaps and anisotropic
   filtering determined by the user.

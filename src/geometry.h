@@ -58,7 +58,7 @@ public:
   // Creates a geometry object
   geometry() throw(...);
   // Creates a geometry object from a model file
-  geometry(const std::string &filename) throw(...);
+  explicit geometry(const std::string &filename) throw(...);
   // Move constructor
   geometry(geometry &&other);
   // Default copy constructor and assignment operator

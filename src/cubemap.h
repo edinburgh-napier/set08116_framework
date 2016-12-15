@@ -15,7 +15,7 @@ public:
   // Creates a new cubemap
   cubemap() {}
   // Creates a new cubemap given six filenames
-  cubemap(const std::array<std::string, 6> &filenames) throw(...);
+  explicit cubemap(const std::array<std::string, 6> &filenames) throw(...);
   // Default copy constructor and assignment operator
   cubemap(const cubemap &other) = default;
   cubemap &operator=(const cubemap &rhs) = default;

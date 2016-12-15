@@ -6,9 +6,7 @@
 
 namespace graphics_framework {
 // Creates a depth buffer object
-depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...) : _width(width), _height(height) {
-  // Create depth texture
-  _depth = texture(width, height);
+depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...) : _width(width), _height(height), _depth(texture(width, height)) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, _depth.get_id());
   // Check for error

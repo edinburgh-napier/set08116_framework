@@ -67,7 +67,7 @@ include_directories("${glew_SOURCE_DIR}/include")
 
 download_project(PROJ glm
   GIT_REPOSITORY      https://github.com/g-truc/glm.git
-  GIT_TAG             master
+  GIT_TAG             6a1e2ec
   ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 add_subdirectory(${glm_SOURCE_DIR} ${glm_BINARY_DIR})

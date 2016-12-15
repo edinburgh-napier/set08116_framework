@@ -107,8 +107,8 @@ geometry geometry_builder::create_box(const glm::vec3 &dims) {
     // Recalculate minimal and maximal
     minimal = glm::min(minimal, pos);
     maximal = glm::max(maximal, pos);
-    // Normal is one of the six defined.  Divide index by 4 to get the value
-    normals.push_back(box_normals[i / 4]);
+    //TODO: fix
+    normals.push_back(box_normals[i % 6]);
     // Set the colour to be light grey
     colours.push_back(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
   }
@@ -579,13 +579,12 @@ geometry geometry_builder::create_sphere(const unsigned int stacks, const unsign
   float delta_T = dims.y / static_cast<float>(stacks);
   float delta_S = dims.x / static_cast<float>(slices);
   float t = dims.y;
-  float s = 0.0f;
-
+ 
   // Iterate through each stack
   for (unsigned int i = 0; i < stacks; ++i) {
     // Set starting values for stack
     float rho = i * delta_rho;
-    s = 0.0f;
+    float s = 0.0f;
     // Vertex data generated
     std::array<glm::vec3, 4> verts;
     std::array<glm::vec2, 4> coords;

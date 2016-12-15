@@ -27,7 +27,7 @@ public:
   // Creates a mesh object
   mesh() {}
   // Creates a mesh object with the provided geometry
-  mesh(geometry &geom) : _geometry(geom), _minimal(geom.get_minimal_point()), _maximal(geom.get_maximal_point()) {}
+  explicit mesh(geometry &geom) : _geometry(geom), _minimal(geom.get_minimal_point()), _maximal(geom.get_maximal_point()) {}
   // Creates a mesh object with the provided geometry and material
   mesh(geometry &geom, material &mat)
       : _geometry(geom), _minimal(geom.get_minimal_point()), _maximal(geom.get_maximal_point()) {}
