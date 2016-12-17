@@ -30,5 +30,7 @@ public:
   void rotate(float delta_yaw, float delta_pitch);
   // Moves the camera
   void move(const glm::vec3 &translation);
+  //
+  glm::vec3 get_forward() const;
 };
 }

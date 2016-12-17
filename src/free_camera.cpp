@@ -7,9 +7,9 @@ Updates the free camera.  Delta time is not used
 */
 void free_camera::update(float delta_time) {
   // Calculate the forward direction - spherical coordinates to Cartesian
-  glm::vec3 forward(cosf(_pitch) * -sinf(_yaw), sinf(_pitch), -cosf(_yaw) * cosf(_pitch));
+
   // Normalize forward
-  forward = glm::normalize(forward);
+  auto forward = get_forward();
 
   // Calculate standard right.  Rotate right vector by yaw
   glm::vec3 right = glm::vec3(glm::eulerAngleY(_yaw) * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -53,5 +53,8 @@ calculate actual movement
 void free_camera::move(const glm::vec3 &translation) {
   // Just add translation vector to current translation
   _translation += translation;
+}
+glm::vec3 free_camera::get_forward() const {
+  return glm::normalize(glm::vec3(cosf(_pitch) * -sinf(_yaw), sinf(_pitch), -cosf(_yaw) * cosf(_pitch)));
 }
 }
