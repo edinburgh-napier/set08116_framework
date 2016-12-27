@@ -48,6 +48,56 @@ option(GLM_TEST_ENABLE_SIMD_SSE3 "" ON)
 option(ASSIMP_BUILD_ASSIMP_TOOLS "" OFF)
 option(ASSIMP_BUILD_TESTS "" OFF)
 set(LIBRARY_SUFFIX "" CACHE STRING "the suffix for the assimp windows library")
+set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
+
+#TODO: go back and enable this, submit bug report
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+
+set(ASSIMP_BUILD_MDC_IMPORTER OFF CACHE BOOL "" FORCE)
+#set(ASSIMP_BUILD_3DS_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_AC_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASE_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSBIN_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ASSXML_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_B3D_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_BVH_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_COLLADA_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_DXF_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_CSM_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_HMP_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_IRRMESH_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_IRR_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_LWO_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_LWS_IMPORTER OFF CACHE BOOL "" FORCE)
+#set(ASSIMP_BUILD_MD2_IMPORTER OFF CACHE BOOL "" FORCE)
+#set(ASSIMP_BUILD_MD3_IMPORTER OFF CACHE BOOL "" FORCE)
+#set(ASSIMP_BUILD_MD5_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_MDC_IMPORTER OFF CACHE BOOL "" FORCE)
+#set(ASSIMP_BUILD_MDL_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_NFF_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_NDO_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_OFF_IMPORTER OFF CACHE BOOL "" FORCE)
+#set(ASSIMP_BUILD_OBJ_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_OGRE_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_OPENGEX_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_PLY_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_MS3D_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_COB_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_BLEND_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_XGL_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_Q3D_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_Q3BSP_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_RAW_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SIB_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_SMD_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_STL_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_TERRAGEN_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_3D_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_GLTF_IMPORTER OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "" FORCE)
  
 download_project(PROJ glfw
   GIT_REPOSITORY      https://github.com/glfw/glfw.git
@@ -73,13 +123,13 @@ download_project(PROJ glm
 add_subdirectory(${glm_SOURCE_DIR} ${glm_BINARY_DIR})
 include_directories("${glm_SOURCE_DIR}")
 
-#download_project(PROJ assimp
-#  GIT_REPOSITORY      https://github.com/assimp/assimp
-#  GIT_TAG             master
-#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-#)
-#add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
-#include_directories("${assimp_SOURCE_DIR}/include")
+download_project(PROJ assimp
+  GIT_REPOSITORY      https://github.com/assimp/assimp
+  GIT_TAG             a8673d4
+  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+)
+add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
+include_directories("${assimp_SOURCE_DIR}/include")
 
 #download_project(PROJ devil
 #  GIT_REPOSITORY      https://github.com/DentonW/DevIL
@@ -121,17 +171,17 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
 if(${MSVC})
 target_compile_options(enu_graphics_framework PUBLIC /MP)
 #target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
-target_link_libraries(enu_graphics_framework glfw3dll optimized libglew_shared debug libglew_sharedd)
+target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
 else()
   #libglewd.dylib
   #libglfw.dylib
 
   #target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
-  target_link_libraries(enu_graphics_framework glfw optimized glew_shared debug glewd)
+  target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
 endif()
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 #add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
-add_dependencies(enu_graphics_framework libglew_shared glfw glm)
+add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 

@@ -25,9 +25,9 @@
 #include <GLFW/glfw3.h>
 #include <algorithm>
 #include <array>
-//#include <assimp/Importer.hpp>
-//#include <assimp/postprocess.h>
-//#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <cassert>
 #include <chrono>
 #include <fstream>
