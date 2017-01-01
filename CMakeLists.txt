@@ -131,29 +131,29 @@ download_project(PROJ assimp
 add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
 include_directories("${assimp_SOURCE_DIR}/include")
 
-#download_project(PROJ devil
-#  GIT_REPOSITORY      https://github.com/DentonW/DevIL
-#  GIT_TAG             master
-#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-#)
-#add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
-#include_directories("${devil_SOURCE_DIR}/include")
+download_project(PROJ devil
+  GIT_REPOSITORY      https://github.com/DentonW/DevIL
+  GIT_TAG             845185a
+  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+)
+add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
+include_directories("${devil_SOURCE_DIR}/DevIL/include")
 
 link_directories("${glew_BINARY_DIR}/../lib/")
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 if(ENU_GFX_TEST)
-add_executable(enu_graphics_framework ${SOURCE_FILES})
+  add_executable(enu_graphics_framework ${SOURCE_FILES})
 else()
-list(REMOVE_ITEM SOURCE_FILES "src/main.cpp")
-include (GenerateExportHeader)
-add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
-GENERATE_EXPORT_HEADER( enu_graphics_framework
-             BASE_NAME enu_graphics_framework
-             EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
-             EXPORT_FILE_NAME enu_graphics_framework_Export.h
-             STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
-)
+  list(REMOVE_ITEM SOURCE_FILES "src/main.cpp")
+  include (GenerateExportHeader)
+  add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
+  GENERATE_EXPORT_HEADER( enu_graphics_framework
+               BASE_NAME enu_graphics_framework
+               EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
+               EXPORT_FILE_NAME enu_graphics_framework_Export.h
+               STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
+  )
 endif()
 
 FIND_PACKAGE( OpenGL REQUIRED)
@@ -168,20 +168,18 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
         "${PROJECT_SOURCE_DIR}/res"      # <--this is in-file
         $<TARGET_FILE_DIR:enu_graphics_framework>)                 # <--this is out-file path
 
+        
 if(${MSVC})
-target_compile_options(enu_graphics_framework PUBLIC /MP)
-#target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
-target_link_libraries(enu_graphics_framework glfw3dll assimp optimized libglew_shared debug libglew_sharedd)
+  target_compile_options(enu_graphics_framework PUBLIC /MP)
+  target_link_libraries(enu_graphics_framework glfw3dll assimp DevIL optimized libglew_shared debug libglew_sharedd)
 else()
-  #libglewd.dylib
-  #libglfw.dylib
-
-  #target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
-  target_link_libraries(enu_graphics_framework glfw assimp optimized glew_shared debug glewd)
+  target_link_libraries(enu_graphics_framework glfw assimp DevIL optimized glew_shared debug glewd)
 endif()
+
+
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 #add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
-add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
+add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 

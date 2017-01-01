@@ -2,6 +2,7 @@
 
 #include "renderer.h"
 #include "util.h"
+#include <IL/il.h>
 
 namespace graphics_framework {
 float renderer::_clear_r;
@@ -95,6 +96,18 @@ bool renderer::initialise() {
     // Terminate GLFW
     glfwTerminate();
     return false;
+  }
+
+  // Init DevIL
+  {
+    std::clog << "Loading DevIL Image Loader, Version: " << IL_VERSION << std::endl;
+    ilInit();
+    const ILenum deverr = ilGetError();
+
+    if (IL_NO_ERROR != deverr) {
+      std::cerr << "Error initialising Devil: " << deverr << std::endl;
+      return false;
+    }
   }
 
 #if defined(DEBUG) | defined(_DEBUG)
