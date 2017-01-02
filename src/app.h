@@ -22,12 +22,7 @@ private:
 
 public:
   // Creates rendering application.  Initialises the renderer
-  app() {
-    // Create renderer instance
-    renderer::_instance = new renderer();
-    // Initialise
-    renderer::initialise();
-  }
+  app(renderer::ScreenMode sm = renderer::windowed, unsigned int width = 1280, unsigned int height = 720);
   // Deleted copy, move constructor and assignment operator
   app(const app &other) = delete;
   app(app &&other) = delete;

@@ -56,6 +56,30 @@ bool update(float delta_time) {
   theta += pi<float>() * delta_time;
   // Update the camera
   cam.update(delta_time);
+
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_F)) {
+    renderer::set_screen_dimensions(1280, 720);
+    auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
+    cam.set_projection(quarter_pi<float>(), aspect, 2.414f, 1000.0f);
+  }
+
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_G)) {
+    renderer::set_screen_dimensions(800, 600);
+    auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
+    cam.set_projection(quarter_pi<float>(), aspect, 2.414f, 1000.0f);
+  }
+
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_H)) {
+    renderer::set_screen_mode(renderer::borderless);
+    auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
+    cam.set_projection(quarter_pi<float>(), aspect, 2.414f, 1000.0f);
+  }
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_J)) {
+    renderer::set_screen_mode(renderer::fullscreen);
+    auto aspect = static_cast<float>(renderer::get_screen_width()) / static_cast<float>(renderer::get_screen_height());
+    cam.set_projection(quarter_pi<float>(), aspect, 2.414f, 1000.0f);
+  }
+
   return true;
 }
 
@@ -93,7 +117,7 @@ bool render() {
 
 int main() {
   // Create application
-  app application;
+  app application(renderer::windowed);
   // Set load content, update and render methods
   application.set_load_content(load_content);
   application.set_update(update);

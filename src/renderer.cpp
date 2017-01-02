@@ -22,8 +22,48 @@ void print_GL_info() {
 // Builds any necessary content for the render framework
 void build_content() {}
 
+void renderer::set_screen_dimensions(unsigned int w, unsigned int h) {
+  _instance->_width = w;
+  _instance->_height = h;
+  set_screen_mode(windowed);
+}
+
+void renderer::set_screen_mode(ScreenMode sm) {
+  auto monitor = glfwGetPrimaryMonitor();
+  auto mode = glfwGetVideoMode(monitor);
+  glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+  glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+  glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+  glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+  switch (sm) {
+  case renderer::windowed:
+    glfwWindowHint(GLFW_DECORATED, GL_TRUE);
+    glfwSetWindowMonitor(_instance->_window, NULL, mode->width / 2 - (_instance->_width / 2),
+                         mode->height / 2 - (_instance->_height / 2), _instance->_width, _instance->_height,
+                         mode->refreshRate);
+    break;
+  case renderer::borderless:
+    glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+    //-1's, beacuse if windows/AMD sniffs a window at the exact monitor size it converts to fullscreen
+    glfwSetWindowMonitor(_instance->_window, NULL, 0, 0, mode->width - 1, mode->height - 1, mode->refreshRate);
+    _instance->_width = mode->width - 1;
+    _instance->_height = mode->height - 1;
+    break;
+  case renderer::fullscreen:
+    glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+    glfwSetWindowMonitor(_instance->_window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+    _instance->_width = mode->width;
+    _instance->_height = mode->height;
+    break;
+  default:
+    break;
+  }
+  glViewport(0, 0, _instance->_width, _instance->_height);
+}
+
 // Initialises the renderer
-bool renderer::initialise() {
+bool renderer::initialise(renderer::ScreenMode sm, unsigned int width, unsigned int height) {
   renderer::_clear_r = 0.0f;
   renderer::_clear_g = 1.0f;
   renderer::_clear_b = 1.0f;
@@ -45,8 +85,10 @@ bool renderer::initialise() {
   auto video_mode = glfwGetVideoMode(monitor);
 
   // Set window hints for GLFW
+
   glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-  glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+
+  // glfwWindowHint(GLFW_ICONIFIED, GL_FALSE);
   glfwWindowHint(GLFW_SAMPLES, 4);
 
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -54,20 +96,36 @@ bool renderer::initialise() {
   glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+  glfwWindowHint(GLFW_RED_BITS, video_mode->redBits);
+  glfwWindowHint(GLFW_GREEN_BITS, video_mode->greenBits);
+  glfwWindowHint(GLFW_BLUE_BITS, video_mode->blueBits);
+  glfwWindowHint(GLFW_REFRESH_RATE, video_mode->refreshRate);
 
 // If in debug mode, set window dimensions to 800 x 600
 #if defined(DEBUG) | defined(_DEBUG)
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-  _instance->_window = glfwCreateWindow(800, 600, "Render Framework", nullptr, nullptr);
-  glfwSetWindowPos(_instance->_window, video_mode->width / 2 - 400, video_mode->height / 2 - 300);
-  _instance->_width = 800;
-  _instance->_height = 600;
-#else
-  // If in release mode, set as fullscreen
-  _instance->_window = glfwCreateWindow(video_mode->width, video_mode->height, "Render Framework", nullptr, nullptr);
-  _instance->_width = video_mode->width;
-  _instance->_height = video_mode->height;
 #endif
+
+  if (sm == windowed) {
+    glfwWindowHint(GLFW_DECORATED, GL_TRUE);
+    _instance->_window = glfwCreateWindow(width, height, "Render Framework", nullptr, nullptr);
+    glfwSetWindowPos(_instance->_window, video_mode->width / 2 - (width / 2), video_mode->height / 2 - (height / 2));
+    _instance->_width = width;
+    _instance->_height = height;
+  } else if (sm == borderless) {
+    glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+    //-1's, beacuse if windows/AMD sniffs a window at the exact monitor size it converts to fullscreen
+    _instance->_window =
+        glfwCreateWindow(video_mode->width - 1, video_mode->height - 1, "Render Framework", nullptr, nullptr);
+    _instance->_width = video_mode->width - 1;
+    _instance->_height = video_mode->height - 1;
+  } else {
+    glfwWindowHint(GLFW_DECORATED, GL_FALSE);
+    _instance->_window = glfwCreateWindow(video_mode->width, video_mode->height, "Render Framework", monitor, nullptr);
+    _instance->_width = video_mode->width;
+    _instance->_height = video_mode->height;
+  }
+
   // Check if window was created
   if (_instance->_window == nullptr) {
     // Display error

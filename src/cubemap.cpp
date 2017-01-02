@@ -139,6 +139,7 @@ bool cubemap::set_texture(GLenum target, const std::string &filename) throw(...)
     // Throw exception
     throw std::runtime_error("Error binding cubemap");
   }
+  //TODO
   // Get image format
   // auto format = FreeImage_GetFileType(filename.c_str());
   // Load the image

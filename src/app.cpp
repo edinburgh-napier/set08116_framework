@@ -3,6 +3,14 @@
 #include "app.h"
 
 namespace graphics_framework {
+
+app::app(renderer::ScreenMode sm, unsigned int width, unsigned int height) {
+  // Create renderer instance
+  renderer::_instance = new renderer();
+  // Initialise
+  renderer::initialise(sm, width, height);
+}
+
 // Runs the main application
 void app::run() {
   // Check if renderer intialised

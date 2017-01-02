@@ -7,13 +7,13 @@ namespace graphics_framework {
 /*
 Creates a new geometry object
 */
-geometry::geometry(): _type(GL_TRIANGLES), _vao(0), _index_buffer(0), _vertices(0), _indices(0) {}
+geometry::geometry() : _type(GL_TRIANGLES), _vao(0), _index_buffer(0), _vertices(0), _indices(0) {}
 
 /*
 Creates a piece of geometry by loading in a model
 */
-geometry::geometry(const std::string &filename): geometry() {
-  
+geometry::geometry(const std::string &filename) : geometry() {
+
   // Check that file exists
   assert(check_file_exists(filename));
   // Create model importer
@@ -104,7 +104,6 @@ geometry::geometry(const std::string &filename): geometry() {
 
   // Log success
   std::clog << "LOG - geometry " << filename << " loaded" << std::endl;
-  
 }
 
 // Move constructor

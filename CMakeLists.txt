@@ -50,12 +50,10 @@ option(ASSIMP_BUILD_TESTS "" OFF)
 set(LIBRARY_SUFFIX "" CACHE STRING "the suffix for the assimp windows library")
 set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
-#
+#LIBPNG
 set(PNG_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 set(PNG_TESTS OFF CACHE BOOL "" FORCE)
 set(PNG_STATIC OFF CACHE BOOL "" FORCE)
-#
-#set(IL_NO_PNG 0)
 set(SKIP_INSTALL_ALL ON CACHE BOOL "" FORCE)
 
 #TODO: go back and enable this, submit bug report
@@ -106,7 +104,8 @@ set(ASSIMP_BUILD_3D_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_GLTF_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "" FORCE)
- 
+
+#====================================================================
 download_project(PROJ zlib
   GIT_REPOSITORY      https://github.com/madler/zlib
   GIT_TAG             2fa463b
@@ -154,8 +153,8 @@ add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
 include_directories("${assimp_SOURCE_DIR}/include")
 
 download_project(PROJ libpng
-  GIT_REPOSITORY      https://github.com/dooglz/libpng.git
-  GIT_TAG             14e885a
+  GIT_REPOSITORY      https://github.com/glennrp/libpng.git
+  GIT_TAG             f981826
   ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 add_subdirectory(${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
@@ -179,13 +178,13 @@ SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
 
 download_project(PROJ devil
   GIT_REPOSITORY      https://github.com/dooglz/DevIL.git
-  GIT_TAG             96300ee
+  GIT_TAG             7129e65
   ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 
 add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
 include_directories("${devil_SOURCE_DIR}/DevIL/include")
-
+#====================================================================
 
 link_directories("${glew_BINARY_DIR}/../lib/")
 
@@ -197,10 +196,10 @@ else()
   include (GenerateExportHeader)
   add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
   GENERATE_EXPORT_HEADER( enu_graphics_framework
-               BASE_NAME enu_graphics_framework
-               EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
-               EXPORT_FILE_NAME enu_graphics_framework_Export.h
-               STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
+                           BASE_NAME enu_graphics_framework
+                           EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
+                           EXPORT_FILE_NAME enu_graphics_framework_Export.h
+                           STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
   )
 endif()
 
@@ -211,19 +210,17 @@ else()
   message("OPENGL NOT FOUND")
 endif()
 
-add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post-build event to MyTest
-    COMMAND ${CMAKE_COMMAND} -E copy_directory   # which executes "cmake - E copy_if_different..."
-        "${PROJECT_SOURCE_DIR}/res"      # <--this is in-file
-        $<TARGET_FILE_DIR:enu_graphics_framework>)                 # <--this is out-file path
+add_custom_command(TARGET enu_graphics_framework POST_BUILD 
+                    COMMAND ${CMAKE_COMMAND} -E copy_directory  
+                    "${PROJECT_SOURCE_DIR}/res"
+                    $<TARGET_FILE_DIR:enu_graphics_framework>)           
 
-        
 if(${MSVC})
   target_compile_options(enu_graphics_framework PUBLIC /MP)
   target_link_libraries(enu_graphics_framework glfw3dll assimp DevIL ILU zlibd optimized libglew_shared debug libglew_sharedd)
 else()
   target_link_libraries(enu_graphics_framework glfw assimp DevIL zlibd optimized glew_shared debug glewd)
 endif()
-
 
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 add_dependencies(png zlib)
@@ -233,7 +230,31 @@ add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL ILU)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 
+set_target_properties(glfw PROPERTIES FOLDER "DEPS")
+set_target_properties(zlib PROPERTIES FOLDER "DEPS")
+set_target_properties(IL PROPERTIES FOLDER "DEPS")
+set_target_properties(png PROPERTIES FOLDER "DEPS")
+set_target_properties(jpeg PROPERTIES FOLDER "DEPS")
+set_target_properties(ILU PROPERTIES FOLDER "DEPS")
+set_target_properties(pngfix PROPERTIES FOLDER "DEPS")
+set_target_properties(genfiles PROPERTIES FOLDER "DEPS")
+set_target_properties(png-fix-itxt PROPERTIES FOLDER "DEPS")
+
+set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "JUNK")
+set_target_properties(uninstall PROPERTIES FOLDER "JUNK")
+set_target_properties(glm_dummy PROPERTIES FOLDER "JUNK")
+set_target_properties(example PROPERTIES FOLDER "JUNK")
+set_target_properties(minigzip PROPERTIES FOLDER "JUNK")
+set_target_properties(zlibstatic PROPERTIES FOLDER "JUNK")
+set_target_properties(ILUT PROPERTIES FOLDER "JUNK")
+
+set(deps glfw zlib jpeg png IL ILU pngfix png-fix-itxt assimp)
+
 if(${MSVC})
+#Disable warnings for deps
+  FOREACH(dep ${deps})
+  target_compile_options(${dep} PUBLIC "/W0")
+  ENDFOREACH()
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/enu_graphics_framework.vcxproj.user" 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>
     <Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">

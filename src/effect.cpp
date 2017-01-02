@@ -25,7 +25,7 @@ bool read_file(const std::string &filename, std::string &content) {
 }
 
 // Creates an effect object
-effect::effect(): _program(-1){}
+effect::effect() : _program(-1) {}
 
 // Adds a shader to the effect object
 void effect::add_shader(const std::string &filename, GLenum type) throw(...) {
