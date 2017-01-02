@@ -2,7 +2,7 @@
 
 #include "texture.h"
 #include "util.h"
-//#include <FreeImage\FreeImage.h>
+#include <IL/il.h>
 
 namespace graphics_framework {
 // Creates a new texture object with the given dimensions
@@ -29,6 +29,29 @@ texture::texture(const std::string &filename) throw(...) : texture(filename, tru
 texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) throw(...) {
   // Check if file exists
   assert(check_file_exists(filename));
+
+  ILuint ImgId = -1;
+  // Generate the main image name to use.
+  ilGenImages(1, &ImgId);
+
+  // Bind this image name.
+  ilBindImage(ImgId);
+
+  auto success = ilLoadImage(filename.c_str());
+
+  if (get_devil_error()) {
+    throw std::runtime_error("Error creating texture");
+  }
+
+
+  // Convert the image into a suitable format to work with
+  // NOTE: If your image contains alpha channel you can replace IL_RGB with IL_RGBA
+  success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+
+
+  auto width = ilGetInteger(IL_IMAGE_WIDTH);
+  auto height = ilGetInteger(IL_IMAGE_HEIGHT);
+  auto pixel_data = ilGetData();
   /*
   // Get format of image
   auto format = FreeImage_GetFileType(filename.c_str());
@@ -81,16 +104,6 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
     CHECK_GL_ERROR; // Non-fatal
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);
     CHECK_GL_ERROR; // Non-fatal
-  }
-
-  int width = 256;
-  int height = 256;
-  std::array<unsigned char, (256 * 256 * 4)> pixel_data;
-  for (int i = 0; i < (256 * 256 * 4); i++) {
-    if (i > 0 && (i % 3 == 0)) {
-      continue;
-    }
-    pixel_data[i] = (unsigned char)rand();
   }
 
   // Now set texture data

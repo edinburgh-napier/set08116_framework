@@ -27,6 +27,9 @@ bool load_content() {
   //Load in model
   auto src = "../../assimp-src/test/models/OBJ/box.obj";
   geom3 = geometry(src);
+  
+  src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
+  texture tt(src, false, false);
 
   // Load in shaders
   eff.add_shader("shaders/basic.vert", // filename

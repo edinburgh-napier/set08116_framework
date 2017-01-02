@@ -1,7 +1,23 @@
 #include "util.h"
 #include "stdafx.h"
+#include <IL/il.h>
+#include <IL/ilu.h>
 
 namespace graphics_framework {
+
+bool get_devil_error() {
+  bool ret = false;
+  ILenum error = ilGetError();
+
+  if (error != IL_NO_ERROR) {
+    do {
+      ret = true;
+      std::cerr << "DevIL error: " << iluErrorString(error) << std::endl;
+    } while ((error = ilGetError()));
+  }
+  return ret;
+}
+
 inline std::string get_severity(GLenum severity) {
   switch (severity) {
   case GL_DEBUG_SEVERITY_LOW:

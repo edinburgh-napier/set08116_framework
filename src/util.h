@@ -35,6 +35,7 @@ inline bool get_GL_error(int line, const std::string &file) {
   }
   return false;
 }
+
 #define CHECK_GL_ERROR get_GL_error(__LINE__, __FILE__)
 #define SET_DEBUG set_debug()
 #define _CRTDBG_MAP_ALLOC
@@ -56,4 +57,5 @@ void screen_pos_to_world_ray(float mouse_X, float mouse_Y, unsigned int screen_w
 // Utility function to test intersection between ray and mesh bounding box
 bool test_ray_oobb(const glm::vec3 &origin, const glm::vec3 &direction, const glm::vec3 &aabb_min,
                    const glm::vec3 &aabb_max, const glm::mat4 &model, float &distance);
+bool get_devil_error();
 }

@@ -49,6 +49,12 @@ option(ASSIMP_BUILD_ASSIMP_TOOLS "" OFF)
 option(ASSIMP_BUILD_TESTS "" OFF)
 set(LIBRARY_SUFFIX "" CACHE STRING "the suffix for the assimp windows library")
 set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
+#
+set(PNG_BUILD_ZLIB ON CACHE BOOL "" FORCE)
+set(PNG_TESTS OFF CACHE BOOL "" FORCE)
+set(PNG_STATIC OFF CACHE BOOL "" FORCE)
+
 
 #TODO: go back and enable this, submit bug report
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
@@ -99,9 +105,21 @@ set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_GLTF_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "" FORCE)
  
+download_project(PROJ zlib
+  GIT_REPOSITORY      https://github.com/madler/zlib
+  GIT_TAG             2fa463b
+  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+)
+add_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
+include_directories(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
+SET(ZLIB_FOUND 1)
+#SET(ZLIB_LIBRARIES zlibstatic)
+SET(ZLIB_LIBRARIES zlib)
+SET(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
+  
 download_project(PROJ glfw
   GIT_REPOSITORY      https://github.com/glfw/glfw.git
-  GIT_TAG             master
+  GIT_TAG             0f488ac
   ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
@@ -109,7 +127,7 @@ include_directories("${glfw_SOURCE_DIR}/include")
 
 download_project(PROJ glew
   GIT_REPOSITORY      https://github.com/Perlmint/glew-cmake.git
-  GIT_TAG             master
+  GIT_TAG             7be0923
   ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
 add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
@@ -138,6 +156,15 @@ download_project(PROJ devil
 )
 add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
 include_directories("${devil_SOURCE_DIR}/DevIL/include")
+#set(ZLIB_LIBRARY "zlibstatic" CACHE STRING "" FORCE)
+#
+#download_project(PROJ libpng
+#  GIT_REPOSITORY      https://github.com/dooglz/libpng.git
+#  GIT_TAG             14e885a
+#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+#)
+#add_subdirectory(${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
+#include_directories("${libpng_SOURCE_DIR}/include")
 
 link_directories("${glew_BINARY_DIR}/../lib/")
 
@@ -171,15 +198,17 @@ add_custom_command(TARGET enu_graphics_framework POST_BUILD        # Adds a post
         
 if(${MSVC})
   target_compile_options(enu_graphics_framework PUBLIC /MP)
-  target_link_libraries(enu_graphics_framework glfw3dll assimp DevIL optimized libglew_shared debug libglew_sharedd)
+  target_link_libraries(enu_graphics_framework glfw3dll assimp DevIL ILU zlibd optimized libglew_shared debug libglew_sharedd)
 else()
-  target_link_libraries(enu_graphics_framework glfw assimp DevIL optimized glew_shared debug glewd)
+  target_link_libraries(enu_graphics_framework glfw assimp DevIL zlibd optimized glew_shared debug glewd)
 endif()
 
 
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
-#add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp)
-add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL)
+#add_dependencies(png zlibstatic)
+add_dependencies(assimp zlib)
+add_dependencies(IL zlib)
+add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL ILU)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 
