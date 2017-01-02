@@ -54,7 +54,9 @@ set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 set(PNG_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 set(PNG_TESTS OFF CACHE BOOL "" FORCE)
 set(PNG_STATIC OFF CACHE BOOL "" FORCE)
-
+#
+#set(IL_NO_PNG 0)
+set(SKIP_INSTALL_ALL ON CACHE BOOL "" FORCE)
 
 #TODO: go back and enable this, submit bug report
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
@@ -113,8 +115,10 @@ download_project(PROJ zlib
 add_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
 include_directories(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
 SET(ZLIB_FOUND 1)
-#SET(ZLIB_LIBRARIES zlibstatic)
+#This is for assimp
 SET(ZLIB_LIBRARIES zlib)
+#This is for libpng
+SET(ZLIB_LIBRARY zlib)
 SET(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
   
 download_project(PROJ glfw
@@ -149,6 +153,25 @@ download_project(PROJ assimp
 add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
 include_directories("${assimp_SOURCE_DIR}/include")
 
+download_project(PROJ libpng
+  GIT_REPOSITORY      https://github.com/dooglz/libpng.git
+  GIT_TAG             14e885a
+  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+)
+add_subdirectory(${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
+include_directories("${libpng_SOURCE_DIR}")
+
+SET(PNG_FOUND 1)
+SET(PNG_INCLUDE_DIRS ${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
+SET(PNG_LIBRARIES png)
+SET(IL_PNG_LIB png)
+
+#download_project(PROJ devil
+#  GIT_REPOSITORY      https://github.com/dooglz/DevIL.git
+#  GIT_TAG             a2d9193
+#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+#)
+
 download_project(PROJ devil
   GIT_REPOSITORY      https://github.com/DentonW/DevIL
   GIT_TAG             845185a
@@ -156,15 +179,7 @@ download_project(PROJ devil
 )
 add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
 include_directories("${devil_SOURCE_DIR}/DevIL/include")
-#set(ZLIB_LIBRARY "zlibstatic" CACHE STRING "" FORCE)
-#
-#download_project(PROJ libpng
-#  GIT_REPOSITORY      https://github.com/dooglz/libpng.git
-#  GIT_TAG             14e885a
-#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-#)
-#add_subdirectory(${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
-#include_directories("${libpng_SOURCE_DIR}/include")
+
 
 link_directories("${glew_BINARY_DIR}/../lib/")
 
@@ -205,9 +220,9 @@ endif()
 
 
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
-#add_dependencies(png zlibstatic)
+add_dependencies(png zlib)
 add_dependencies(assimp zlib)
-add_dependencies(IL zlib)
+add_dependencies(IL png zlib)
 add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL ILU)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)

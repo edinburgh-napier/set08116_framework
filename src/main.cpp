@@ -28,7 +28,8 @@ bool load_content() {
   auto src = "../../assimp-src/test/models/OBJ/box.obj";
   geom3 = geometry(src);
   
-  src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
+  //src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
+  src = "../../libpng-src/contrib/testpngs/rgb-8.png";
   texture tt(src, false, false);
 
   // Load in shaders
