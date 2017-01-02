@@ -3,6 +3,7 @@
 #include "texture.h"
 #include "util.h"
 #include <IL/il.h>
+#include <IL/ilu.h>
 
 namespace graphics_framework {
 // Creates a new texture object with the given dimensions
@@ -43,32 +44,20 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
     throw std::runtime_error("Error creating texture");
   }
 
+  {
+    ILinfo ImageInfo;
+    iluGetImageInfo(&ImageInfo);
+    if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT) {
+      iluFlipImage();
+    }
+  }
 
   // Convert the image into a suitable format to work with
-  // NOTE: If your image contains alpha channel you can replace IL_RGB with IL_RGBA
   success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
-
-
-  auto width = ilGetInteger(IL_IMAGE_WIDTH);
-  auto height = ilGetInteger(IL_IMAGE_HEIGHT);
+  const auto width = ilGetInteger(IL_IMAGE_WIDTH);
+  const auto height = ilGetInteger(IL_IMAGE_HEIGHT);
   auto pixel_data = ilGetData();
-  /*
-  // Get format of image
-  auto format = FreeImage_GetFileType(filename.c_str());
-  // Load image data
-  auto image = FreeImage_Load(format, filename.c_str(), 0);
-  // Convert image to 32bit format
-  auto temp = image;
-  image = FreeImage_ConvertTo32Bits(image);
-  FreeImage_Unload(temp);
 
-  // Get image details
-  auto width = FreeImage_GetWidth(image);
-  auto height = FreeImage_GetHeight(image);
-
-  // Get pixel data
-  auto pixel_data = FreeImage_GetBits(image);
-  */
   // Generate texture with OpenGL
   glGenTextures(1, &_id);
   glBindTexture(GL_TEXTURE_2D, _id);
@@ -108,6 +97,9 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
 
   // Now set texture data
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, &pixel_data[0]);
+  // clear out ddata from DevIL
+  ilDeleteImage(ImgId);
+  pixel_data = nullptr;
 
   // Check if error
   if (CHECK_GL_ERROR) {
@@ -137,7 +129,7 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
   CHECK_GL_ERROR; // Non-fatal - just info
 
   // Log
-  std::clog << "LOG - texture " << filename << " loaded" << std::endl;
+  std::clog << "LOG - texture " << filename << " loaded, " << width << 'x' << height << std::endl;
 }
 
 // Creates a new texture from the given colour data

@@ -9,6 +9,9 @@ geometry geom;
 geometry geom2;
 geometry geom3;
 effect eff;
+effect teff;
+texture tpng;
+texture tjpg;
 target_camera cam;
 float theta = 0.0f;
 
@@ -22,24 +25,24 @@ bool load_content() {
   geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
   geom.add_buffer(colours, BUFFER_INDEXES::COLOUR_BUFFER);
 
-  //geom2 = geometry_builder::create_box();
+  geom2 = geometry_builder::create_plane(10, 10);
 
-  //Load in model
+  // Load in model
   auto src = "../../assimp-src/test/models/OBJ/box.obj";
   geom3 = geometry(src);
-  
-  //src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
-  src = "../../libpng-src/contrib/testpngs/rgb-8.png";
-  texture tt(src, false, false);
+
+  src = "../../assimp-src/test/models/LWO/LWO2/uvtest.png";
+  tpng = texture(src, false, false);
+  src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
+  tjpg = texture(src, false, false);
 
   // Load in shaders
-  eff.add_shader("shaders/basic.vert", // filename
-                 GL_VERTEX_SHADER);    // type
-  eff.add_shader("shaders/basic.frag", // filename
-                 GL_FRAGMENT_SHADER);  // type
-                                       // Build effect
+  eff.add_shader("shaders/basic.vert", GL_VERTEX_SHADER);
+  eff.add_shader("shaders/basic.frag", GL_FRAGMENT_SHADER);
   eff.build();
-
+  teff.add_shader("shaders/basic_textured.vert", GL_VERTEX_SHADER);
+  teff.add_shader("shaders/basic_textured.frag", GL_FRAGMENT_SHADER);
+  teff.build();
   // Set camera properties
   cam.set_position(vec3(10.0f, 10.0f, 10.0f));
   cam.set_target(vec3(0.0f, 0.0f, 0.0f));
@@ -57,12 +60,7 @@ bool update(float delta_time) {
 }
 
 bool render() {
-  // Bind effect
   renderer::bind(eff);
-  // Create MVP matrix
-  // ******************************************************
-  // Create rotation matrix - rotate around Z axis by theta
-  // ******************************************************
   mat4 R;
   R = rotate(mat4(1.0f), theta, vec3(0.0f, 0.0f, 1.0f));
   mat4 M = R;
@@ -77,6 +75,19 @@ bool render() {
                                                       // Render geometry
   renderer::render(geom);
   renderer::render(geom3);
+  //
+
+  renderer::bind(teff);
+  renderer::bind(tjpg, 0);
+  renderer::bind(tpng, 1);
+  glUniform1i(teff.get_uniform_location("tex"), 0);
+  glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE,
+                     value_ptr(P * V * translate(mat4(), vec3(3.0f, -5.0f, -8.0f))));
+  renderer::render(geom2);
+  glUniform1i(teff.get_uniform_location("tex"), 1);
+  glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE,
+                     value_ptr(P * V * translate(mat4(), vec3(-8.0f, -5.0f, -8.0f))));
+  renderer::render(geom2);
   return true;
 }
 

@@ -279,6 +279,9 @@ void renderer::shutdown() {
   std::clog << "LOG - shutdown called on renderer" << std::endl;
   // Set running to false
   _instance->_running = false;
+  // Shutdown DevIL
+  ilShutDown();
+  get_devil_error();
   // Terminated GLFW
   glfwTerminate();
   // Log

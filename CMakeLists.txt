@@ -161,22 +161,28 @@ download_project(PROJ libpng
 add_subdirectory(${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
 include_directories("${libpng_SOURCE_DIR}")
 
-SET(PNG_FOUND 1)
-SET(PNG_INCLUDE_DIRS ${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
-SET(PNG_LIBRARIES png)
-SET(IL_PNG_LIB png)
+SET(PNG_INCLUDE_DIRS ${libpng_SOURCE_DIR} ${libpng_BINARY_DIR} CACHE STRING "")
+SET(PNG_LIBRARIES png CACHE STRING "")
+SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
 
-#download_project(PROJ devil
-#  GIT_REPOSITORY      https://github.com/dooglz/DevIL.git
-#  GIT_TAG             a2d9193
-#  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-#)
-
-download_project(PROJ devil
-  GIT_REPOSITORY      https://github.com/DentonW/DevIL
-  GIT_TAG             845185a
+download_project(PROJ libjpeg
+  GIT_REPOSITORY      https://github.com/dooglz/libjpeg.git
+  GIT_TAG             204c83c449
   ${UPDATE_DISCONNECTED_IF_AVAILABLE}
 )
+add_subdirectory(${libjpeg_SOURCE_DIR} ${libjpeg_BINARY_DIR})
+include_directories("${libjpeg_SOURCE_DIR}")
+
+SET(JPEG_INCLUDE_DIRS ${libjpeg_SOURCE_DIR} ${libjpeg_BINARY_DIR} CACHE STRING "" FORCE)
+SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
+SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
+
+download_project(PROJ devil
+  GIT_REPOSITORY      https://github.com/dooglz/DevIL.git
+  GIT_TAG             96300ee
+  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
+)
+
 add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
 include_directories("${devil_SOURCE_DIR}/DevIL/include")
 
@@ -222,7 +228,7 @@ endif()
 set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 add_dependencies(png zlib)
 add_dependencies(assimp zlib)
-add_dependencies(IL png zlib)
+add_dependencies(IL png jpeg zlib)
 add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL ILU)
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
