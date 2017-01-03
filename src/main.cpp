@@ -143,7 +143,7 @@ bool render() {
 
 int main() {
   // Create application
-  app application(renderer::windowed);
+  app application("Framework test", renderer::windowed);
   // Set load content, update and render methods
   application.set_load_content(load_content);
   application.set_update(update);

@@ -63,7 +63,7 @@ void renderer::set_screen_mode(ScreenMode sm) {
 }
 
 // Initialises the renderer
-bool renderer::initialise(renderer::ScreenMode sm, unsigned int width, unsigned int height) {
+bool renderer::initialise(const std::string &title, renderer::ScreenMode sm, unsigned int width, unsigned int height) {
   renderer::_clear_r = 0.0f;
   renderer::_clear_g = 1.0f;
   renderer::_clear_b = 1.0f;
@@ -108,7 +108,7 @@ bool renderer::initialise(renderer::ScreenMode sm, unsigned int width, unsigned 
 
   if (sm == windowed) {
     glfwWindowHint(GLFW_DECORATED, GL_TRUE);
-    _instance->_window = glfwCreateWindow(width, height, "Render Framework", nullptr, nullptr);
+    _instance->_window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     glfwSetWindowPos(_instance->_window, video_mode->width / 2 - (width / 2), video_mode->height / 2 - (height / 2));
     _instance->_width = width;
     _instance->_height = height;

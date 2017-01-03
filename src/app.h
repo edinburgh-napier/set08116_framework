@@ -22,7 +22,7 @@ private:
 
 public:
   // Creates rendering application.  Initialises the renderer
-  app(renderer::ScreenMode sm = renderer::windowed, unsigned int width = 1280, unsigned int height = 720);
+  app(const std::string& title = "Render Framework", renderer::ScreenMode sm = renderer::windowed, unsigned int width = 1280, unsigned int height = 720);
   // Deleted copy, move constructor and assignment operator
   app(const app &other) = delete;
   app(app &&other) = delete;

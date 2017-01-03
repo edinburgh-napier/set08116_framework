@@ -63,8 +63,8 @@ public:
   // Gets the effect currently bound by the renderer
   static const effect &get_bound_effect() { return _instance->_effect; }
   // Initialises the renderer
-  static bool initialise(renderer::ScreenMode sm = renderer::windowed, unsigned int width = 1280,
-                         unsigned int height = 720);
+  static bool initialise(const std::string &title, renderer::ScreenMode sm = renderer::windowed,
+                         unsigned int width = 1280, unsigned int height = 720);
   static void set_screen_dimensions(unsigned int w, unsigned int h);
   static void set_screen_mode(ScreenMode sm);
   // Begins a render

@@ -4,11 +4,11 @@
 
 namespace graphics_framework {
 
-app::app(renderer::ScreenMode sm, unsigned int width, unsigned int height) {
+app::app(const std::string &title, renderer::ScreenMode sm, unsigned int width, unsigned int height) {
   // Create renderer instance
   renderer::_instance = new renderer();
   // Initialise
-  renderer::initialise(sm, width, height);
+  renderer::initialise(title, sm, width, height);
 }
 
 // Runs the main application
