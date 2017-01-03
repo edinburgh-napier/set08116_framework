@@ -96,7 +96,7 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
   }
 
   // Now set texture data
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_BGRA, GL_UNSIGNED_BYTE, &pixel_data[0]);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &pixel_data[0]);
   // clear out ddata from DevIL
   ilDeleteImage(ImgId);
   pixel_data = nullptr;

@@ -2,7 +2,8 @@
 
 #include "cubemap.h"
 #include "util.h"
-//#include <FreeImage\FreeImage.h>
+#include <IL/il.h>
+#include <IL/ilu.h>
 
 namespace graphics_framework {
 // The 6 targets of the the cubemap
@@ -28,39 +29,6 @@ cubemap::cubemap(const std::array<std::string, 6> &filenames) throw(...) {
     // Throw exception
     throw std::runtime_error("Error creating cubemap texture with OpenGL");
   }
-  // Load in images using FreeImage
-  /*std::array<FIBITMAP*, 6> images;
-
-  for (auto i = 0; i < 6; ++i)
-  {
-          // Get the image format
-          auto format = FreeImage_GetFileType(filenames[i].c_str());
-          // Load the image
-          images[i] = FreeImage_Load(format, filenames[i].c_str(), 0);
-          // Store a temporary version
-          auto temp = images[i];
-          // Convert to a 32 bit image
-          images[i] = FreeImage_ConvertTo32Bits(images[i]);
-          // Unload temporary (non-converted) image
-          FreeImage_Unload(temp);
-// Set temp to converted image
-temp = images[i];
-// Rotate image - OpenGL is a bit silly here
-images[i] = FreeImage_Rotate(images[i], 180.0f);
-// Unload temporary (non-rotated) image
-FreeImage_Unload(temp);
-  }
-  */
-
-  int w = 256;
-  int h = 256;
-  std::array<unsigned char, (256 * 256 * 4)> img;
-  for (int i = 0; i < (256 * 256 * 4); i++) {
-    if (i > 0 && (i % 3 == 0)) {
-      continue;
-    }
-    img[i] = (unsigned char)rand();
-  }
 
   // Set magnification and minification filters
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -72,12 +40,37 @@ FreeImage_Unload(temp);
   glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);
   CHECK_GL_ERROR; // non-fatal
   // Load in each image to OpenGL and assign it to the cubemap texture
+
+  ILuint ImgId = -1;
+  // Generate the main image name to use.
+  ilGenImages(1, &ImgId);
+
+  // Bind this image name.
+  ilBindImage(ImgId);
+
   for (auto i = 0; i < 6; ++i) {
+
+    // Todo Refactor this to a common image place
+    ilLoadImage(filenames[i].c_str());
+
+    if (get_devil_error()) {
+      throw std::runtime_error("Error creating texture");
+    }
+    {
+      ILinfo ImageInfo;
+      iluGetImageInfo(&ImageInfo);
+      if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT) {
+        iluFlipImage();
+      }
+    }
+    iluFlipImage();
+    ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+    const auto width = ilGetInteger(IL_IMAGE_WIDTH);
+    const auto height = ilGetInteger(IL_IMAGE_HEIGHT);
+    const auto pixel_data = ilGetData();
+
     // Load the image into OpenGL
-    glTexImage2D(targets[i], 0, GL_RGBA,
-                 w, // FreeImage_GetWidth(images[i]),
-                 h, // FreeImage_GetHeight(images[i]),
-                 0, GL_BGRA, GL_UNSIGNED_BYTE, &img[0]);
+    glTexImage2D(targets[i], 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &pixel_data[0]);
 
     // Check if loaded OK
     if (CHECK_GL_ERROR) {
@@ -86,7 +79,7 @@ FreeImage_Unload(temp);
       std::cerr << "Could not load texture data for file " << filenames[i] << std::endl;
       // Unload the FreeImage images
       for (auto i = 0; i < 6; ++i) {
-        // FreeImage_Unload(images[i]);
+        ilDeleteImage(ImgId);
       }
       // Delete the texture
       glDeleteTextures(1, &_id);
@@ -95,13 +88,13 @@ FreeImage_Unload(temp);
       throw std::runtime_error("Error loading cubemap textures");
     }
   }
+
+  ilDeleteImage(ImgId);
+
   // Generate the mipmaps
   glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
   CHECK_GL_ERROR; // non-fatal
-  // Unload the FreeImage images
-  for (auto i = 0; i < 6; ++i) {
-    //	FreeImage_Unload(images[i]);
-  }
+
   // Log success
   std::clog << "LOG - cubemap created" << std::endl;
 }
@@ -139,41 +132,35 @@ bool cubemap::set_texture(GLenum target, const std::string &filename) throw(...)
     // Throw exception
     throw std::runtime_error("Error binding cubemap");
   }
-  //TODO
-  // Get image format
-  // auto format = FreeImage_GetFileType(filename.c_str());
-  // Load the image
-  // auto image = FreeImage_Load(format, filename.c_str(), 0);
-  // Store temporary copy of image
-  // auto temp = image;
-  // Convert image to 32bits
-  // image = FreeImage_ConvertTo32Bits(image);
-  // Unload temporary (not converted) image
-  // FreeImage_Unload(temp);
-  // Set temp to converted image
-  // temp = image;
-  // Rotate image - OpenGL is a bit silly here
-  // image = FreeImage_Rotate(image, 180.0f);
-  // Unload temporary (non-rotated) image
-  // FreeImage_Unload(temp);
-  // Load the texture into OpenGL
 
-  int w = 256;
-  int h = 256;
-  std::array<unsigned char, (256 * 256 * 4)> img;
-  for (int i = 0; i < (256 * 256 * 4); i++) {
-    if (i > 0 && (i % 3 == 0)) {
-      continue;
-    }
-    img[i] = (unsigned char)rand();
+  ILuint ImgId = -1;
+  // Generate the main image name to use.
+  ilGenImages(1, &ImgId);
+
+  // Bind this image name.
+  ilBindImage(ImgId);
+
+  // Todo Refactor this to a common image place
+  ilLoadImage(filename.c_str());
+
+  if (get_devil_error()) {
+    throw std::runtime_error("Error creating texture");
   }
-  /*
-  glTexImage2D(target, 0, GL_RGBA, FreeImage_GetWidth(image),
-               FreeImage_GetHeight(image), 0, GL_BGRA, GL_UNSIGNED_BYTE,
-               FreeImage_GetBits(image));
-                           */
+  {
+    ILinfo ImageInfo;
+    iluGetImageInfo(&ImageInfo);
+    if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT) {
+      iluFlipImage();
+    }
+  }
+  iluFlipImage();
+  ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+  const auto width = ilGetInteger(IL_IMAGE_WIDTH);
+  const auto height = ilGetInteger(IL_IMAGE_HEIGHT);
+  const auto pixel_data = ilGetData();
 
-  glTexImage2D(target, 0, GL_RGBA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, &img[0]);
+  // Load the image into OpenGL
+  glTexImage2D(target, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &pixel_data[0]);
 
   // Check if error
   if (CHECK_GL_ERROR) {
@@ -181,7 +168,7 @@ bool cubemap::set_texture(GLenum target, const std::string &filename) throw(...)
     std::cerr << "ERROR - adding a texture to cubemap" << std::endl;
     std::cerr << "Could not load texture data for file " << filename << std::endl;
     // Unload FreeImage image
-    // FreeImage_Unload(image);
+    ilDeleteImage(ImgId);
     // Throw exception
     throw std::runtime_error("Error loading texture");
   }
@@ -189,7 +176,7 @@ bool cubemap::set_texture(GLenum target, const std::string &filename) throw(...)
   glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
   CHECK_GL_ERROR; // Non-fatal
   // Unload OpenGL image
-  // FreeImage_Unload(image);
+  ilDeleteImage(ImgId);
   // Log and return
   std::clog << "LOG - texture added to cubemap" << std::endl;
   return true;
