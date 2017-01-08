@@ -66,8 +66,6 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
     // Problem creating texture object
     std::cerr << "ERROR - loading texture " << filename << std::endl;
     std::cerr << "Could not allocate texture with OpenGL" << std::endl;
-    // Unload FreeImage data
-    // FreeImage_Unload(image);
     // Set id to 0
     _id = 0;
     // Throw exception
@@ -106,8 +104,6 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
     // Error loading texture data into OpenGL
     std::cerr << "ERROR - loading texture " << filename << std::endl;
     std::cerr << "Could not load texture data in OpenGL" << std::endl;
-    // Unload FreeImage data
-    // FreeImage_Unload(image);
     // Unallocate image with OpenGL
     glDeleteTextures(1, &_id);
     _id = 0;
@@ -130,6 +126,82 @@ texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) th
 
   // Log
   std::clog << "LOG - texture " << filename << " loaded, " << width << 'x' << height << std::endl;
+}
+
+texture::texture(const std::vector<std::string> &filenames, bool anisotropic) throw(...) {
+  if (filenames.size() < 2) {
+    throw std::runtime_error("Use The standard Texture fucniton if you don't have any mip levels!");
+  }
+  // Generate texture with OpenGL
+  glGenTextures(1, &_id);
+  glBindTexture(GL_TEXTURE_2D, _id);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 5);
+
+  if (anisotropic) {
+    // Turn on anisotropic filtering
+    float max_anisotropy;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &max_anisotropy);
+    CHECK_GL_ERROR; // Non-fatal
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, max_anisotropy);
+    CHECK_GL_ERROR; // Non-fatal
+  }
+
+  // Check for any errors with OpenGL
+  if (CHECK_GL_ERROR) {
+    std::cerr << "ERROR - loading mipped texture " << filenames[0] << std::endl;
+    std::cerr << "Could not allocate texture with OpenGL" << std::endl;
+    throw std::runtime_error("Error creating texture");
+  }
+
+  for (size_t i = 0; i < filenames.size(); i++) {
+    assert(check_file_exists(filenames[i]));
+
+    ILuint ImgId = -1;
+    // Generate the main image name to use.
+    ilGenImages(1, &ImgId);
+
+    // Bind this image name.
+    ilBindImage(ImgId);
+
+    auto success = ilLoadImage(filenames[i].c_str());
+
+    {
+      ILinfo ImageInfo;
+      iluGetImageInfo(&ImageInfo);
+      if (ImageInfo.Origin == IL_ORIGIN_UPPER_LEFT) {
+        iluFlipImage();
+      }
+    }
+    success = ilConvertImage(IL_RGBA, IL_UNSIGNED_BYTE);
+    const auto width = ilGetInteger(IL_IMAGE_WIDTH);
+    const auto height = ilGetInteger(IL_IMAGE_HEIGHT);
+    const auto pixel_data = ilGetData();
+
+    if (get_devil_error()) {
+      throw std::runtime_error("Error creating MIP texture");
+    }
+
+    glTexImage2D(GL_TEXTURE_2D, i, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, &pixel_data[0]);
+    ilClearImage();
+  }
+
+  // Check error
+  if (CHECK_GL_ERROR) {
+    std::cerr << "ERROR - loading mipped texture " << filenames[0] << std::endl;
+    std::cerr << "Could not allocate texture with OpenGL" << std::endl;
+    throw std::runtime_error("Error creating texture");
+  }
+
+  // Set attributes
+  _type = GL_TEXTURE_2D;
+
+  CHECK_GL_ERROR; // Non-fatal - just info
+
+  // Log
+  std::clog << "LOG - texture With Mips " << filenames[0] << " loaded" << std::endl;
 }
 
 // Creates a new texture from the given colour data

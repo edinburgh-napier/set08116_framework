@@ -24,17 +24,13 @@ public:
   texture(GLuint width, GLuint height) throw(...);
   // Loads a texture from the given filename
   explicit texture(const std::string &filename) throw(...);
-  /*
-  Loads a texture from the given filename with mipmaps and anisotropic
-  filtering determined by the user.
-  */
+  // Loads a texture from the given filename with mipmaps and anisotropicfiltering determined by the user.
   texture(const std::string &filename, bool mipmaps, bool anisotropic) throw(...);
+  // Loads a texture with mips
+  texture(const std::vector<std::string> &filenames, bool anisotropic) throw(...);
   // Creates a texture from the colour data provided
   texture(const std::vector<glm::vec4> &data, GLuint width, GLuint height) throw(...);
-  /*
-  Creates a texture from the colour data provided and with user defined
-  mipmaps and anisotropic filtering
-  */
+  // Creates a texture from the colour data provided and with user defined mipmaps and anisotropic filtering
   texture(const std::vector<glm::vec4> &data, GLuint width, GLuint height, bool mipmaps, bool anisotropic) throw(...);
   // Default copy constructor and assignment operator
   texture(const texture &other) = default;

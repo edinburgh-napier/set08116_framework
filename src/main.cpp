@@ -14,6 +14,7 @@ effect teff;
 effect sbeff;
 texture tpng;
 texture tjpg;
+texture tmipped;
 target_camera cam;
 cubemap cube_map;
 float theta = 0.0f;
@@ -21,12 +22,15 @@ float theta = 0.0f;
 bool load_content() {
   // Create triangle data
   // Positions
-  vector<vec3> positions{vec3(0.0f, 1.0f, 0.0f), vec3(-1.0f, -1.0f, 0.0f), vec3(1.0f, -1.0f, 0.0f)};
-  // Colours
-  vector<vec4> colours{vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 1.0f)};
+  geom.set_type(GL_TRIANGLE_STRIP);
+  vector<vec3> positions{vec3(1.0f, 0.0f, 1.0f), vec3(1.0f, 0.0f, -1.0f), vec3(-1.0f, 0.0f, 1.0f),
+                         vec3(-1.0f, 0.0f, -1.0f)};
+  // Texture coordinates
+  vector<vec2> tex_coords{vec2(0.0f, 0.0f), vec2(40.0f, 0.0f), vec2(0.0f, 40.0f), vec2(40.0f, 40.0f)};
   // Add to the geometry
   geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
-  geom.add_buffer(colours, BUFFER_INDEXES::COLOUR_BUFFER);
+
+  geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   geom2 = geometry_builder::create_plane(10, 10);
   geom4 = geometry_builder::create_box();
@@ -36,13 +40,19 @@ bool load_content() {
   geom3 = geometry(src);
 
   src = "../../assimp-src/test/models/LWO/LWO2/uvtest.png";
-  tpng = texture(src, false, false);
+  tpng = texture(src, true, false);
   src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
   tjpg = texture(src, false, false);
 
   array<string, 6> filenames = {"textures/sahara_ft.jpg", "textures/sahara_bk.jpg", "textures/sahara_up.jpg",
                                 "textures/sahara_dn.jpg", "textures/sahara_rt.jpg", "textures/sahara_lf.jpg"};
   cube_map = cubemap(filenames);
+
+  vector<string> mipnames = {"textures/uv_32.png", "textures/uv_16.png", "textures/uv_8.png",
+                             "textures/uv_4.png",  "textures/uv_2.png",  "textures/uv_1.png"};
+
+  tmipped = texture(mipnames, false);
+
   // Load in shaders
   eff.add_shader("shaders/basic.vert", GL_VERTEX_SHADER);
   eff.add_shader("shaders/basic.frag", GL_FRAGMENT_SHADER);
@@ -108,13 +118,13 @@ bool render() {
                      GL_FALSE,                        // Transpose the matrix?
                      value_ptr(MVP));                 // Pointer to matrix data
                                                       // Render geometry
-  renderer::render(geom);
   renderer::render(geom3);
   //
 
   renderer::bind(teff);
   renderer::bind(tjpg, 0);
   renderer::bind(tpng, 1);
+  renderer::bind(tmipped, 2);
   glUniform1i(teff.get_uniform_location("tex"), 0);
   glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE,
                      value_ptr(P * V * translate(mat4(), vec3(3.0f, -5.0f, -8.0f))));
@@ -123,6 +133,11 @@ bool render() {
   glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE,
                      value_ptr(P * V * translate(mat4(), vec3(-8.0f, -5.0f, -8.0f))));
   renderer::render(geom2);
+
+  glUniform1i(teff.get_uniform_location("tex"), 2);
+  glUniformMatrix4fv(eff.get_uniform_location("MVP"), 1, GL_FALSE,
+                     value_ptr(P * V * translate(mat4(), vec3(0, -10.0f, 0)) * scale(mat4(), vec3(20.0f))));
+  renderer::render(geom);
 
   // glDisable(GL_DEPTH_TEST);
   // glDepthMask(GL_FALSE);
