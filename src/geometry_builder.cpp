@@ -32,55 +32,42 @@ void generate_tb(geometry &geom, const std::vector<glm::vec3> &normals) {
 
 // Data required for box geometry
 glm::vec3 box_positions[] = {
-    //   G-----H
-    //  /|    /|
-    // A-----B |
-    // | E---|-F
-    // |/    |/
-    // c-----D
-    glm::vec3(-0.5f, 0.5f, -0.5f),  // a -0
-    glm::vec3(0.5f, 0.5f, -0.5f),   // b - 1
-    glm::vec3(-0.5f, -0.5f, -0.5f), // c - 2
-    glm::vec3(0.5f, -0.5f, -0.5f),  // d - 3
+    glm::vec3(-0.5f, -0.5f, 0.5f),  glm::vec3(-0.5f, 0.5f, 0.5f),  glm::vec3(-0.5f, 0.5f, -0.5f),
+    glm::vec3(-0.5f, -0.5f, 0.5f),  glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, -0.5f, -0.5f),
+    glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(0.5f, 0.5f, -0.5f),  glm::vec3(0.5f, 0.5f, 0.5f),
+    glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(0.5f, 0.5f, 0.5f),   glm::vec3(0.5f, -0.5f, 0.5f),
+    glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(0.5f, -0.5f, 0.5f),  glm::vec3(-0.5f, -0.5f, 0.5f),
+    glm::vec3(0.5f, -0.5f, -0.5f),  glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec3(-0.5f, -0.5f, -0.5f),
+    glm::vec3(0.5f, 0.5f, 0.5f),    glm::vec3(0.5f, 0.5f, -0.5f),  glm::vec3(-0.5f, 0.5f, -0.5f),
+    glm::vec3(0.5f, 0.5f, 0.5f),    glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, 0.5f),
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec3(0.5f, 0.5f, -0.5f),
+    glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec3(0.5f, 0.5f, -0.5f),  glm::vec3(0.5f, -0.5f, -0.5f),
+    glm::vec3(0.5f, -0.5f, 0.5f),   glm::vec3(0.5f, 0.5f, 0.5f),   glm::vec3(-0.5f, 0.5f, 0.5f),
+    glm::vec3(0.5f, -0.5f, 0.5f),   glm::vec3(-0.5f, 0.5f, 0.5f),  glm::vec3(-0.5f, -0.5f, 0.5f)};
 
-    glm::vec3(-0.5f, 0.5f, 0.5f),  // g - 4
-    glm::vec3(0.5f, 0.5f, 0.5f),   // h - 5
-    glm::vec3(-0.5f, -0.5f, 0.5f), // e - 6
-    glm::vec3(0.5f, -0.5f, 0.5f),  // f - 7
-};
-int box_indices[] = {
-    // front ABC
-    0, 1, 2,
-    // BDC
-    1, 3, 2,
-    // bottom CDE
-    2, 3, 6,
-    // DFE
-    3, 7, 6,
-    // back EFG
-    6, 7, 4,
-    // FHG
-    7, 5, 4,
-    // top GHA
-    4, 5, 0,
-    // HBA
-    5, 1, 0,
-    // left GAE
-    4, 0, 6,
-    // ACE
-    0, 2, 6,
-    // rightBHD
-    1, 5, 3,
-    // HFD
-    5, 7, 3};
-
-// Normals for the box geometry
-glm::vec3 box_normals[6] = {glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -1.0f),
-                            glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f)};
+glm::vec3 box_normals[] = {glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                           glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                           glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(1.0f, 0.0f, 0.0f),
+                           glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(1.0f, 0.0f, 0.0f),  glm::vec3(1.0f, 0.0f, 0.0f),
+                           glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                           glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                           glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 1.0f, 0.0f),
+                           glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 1.0f, 0.0f),  glm::vec3(0.0f, 1.0f, 0.0f),
+                           glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                           glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                           glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, 0.0f, 1.0f),
+                           glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, 0.0f, 1.0f),  glm::vec3(0.0f, 0.0f, 1.0f)};
 
 // Box texture coordinates
-glm::vec2 box_texcoords[4] = {glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 1.0f), glm::vec2(0.0f, 0.0f),
-                              glm::vec2(1.0f, 0.0f)};
+glm::vec2 box_texcoords[] = {
+    glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f),
+    glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f),
+    glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 0.0f),
+    glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f),
+    glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+    glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f),
+    glm::vec2(1.0f, 1.0f), glm::vec2(1.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 1.0f), glm::vec2(0.0f, 0.0f),
+    glm::vec2(0.0f, 1.0f)};
 
 // Creates box geometry
 geometry geometry_builder::create_box(const glm::vec3 &dims) {
@@ -101,39 +88,19 @@ geometry geometry_builder::create_box(const glm::vec3 &dims) {
   // Iterate through each position and add to buffer
   for (unsigned int i = 0; i < 36; ++i) {
     // Calculate position
-    glm::vec3 pos = box_positions[box_indices[i]] * dims;
-    // Add the position data.  Multiply by dimension
+    glm::vec3 pos = box_positions[i] * dims;
     positions.push_back(pos);
     // Recalculate minimal and maximal
     minimal = glm::min(minimal, pos);
     maximal = glm::max(maximal, pos);
-    // TODO: fix
-    normals.push_back(box_normals[i % 6]);
+    normals.push_back(box_normals[i]);
+    tex_coords.push_back(box_texcoords[i]);
     // Set the colour to be light grey
     colours.push_back(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
   }
   // Set minimal and maximal
   geom.set_minimal_point(minimal);
   geom.set_maximal_point(maximal);
-  // Texture coordinates based on side
-  // Front
-  for (unsigned int i = 0; i < 4; ++i)
-    tex_coords.push_back(box_texcoords[i] * glm::vec2(dims));
-  // Right
-  for (unsigned int i = 0; i < 4; ++i)
-    tex_coords.push_back(box_texcoords[i] * glm::vec2(dims.z, dims.y));
-  // Back
-  for (unsigned int i = 0; i < 4; ++i)
-    tex_coords.push_back(box_texcoords[i] * glm::vec2(dims));
-  // Left
-  for (unsigned int i = 0; i < 4; ++i)
-    tex_coords.push_back(box_texcoords[i] * glm::vec2(dims.z, dims.y));
-  // Top
-  for (unsigned int i = 0; i < 4; ++i)
-    tex_coords.push_back(box_texcoords[i] * glm::vec2(dims.x, dims.z));
-  // Bottom
-  for (unsigned int i = 0; i < 4; ++i)
-    tex_coords.push_back(box_texcoords[i] * glm::vec2(dims.x, dims.z));
 
   // Add buffers to geometry
   geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
