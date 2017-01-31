@@ -62,6 +62,10 @@ void renderer::set_screen_mode(ScreenMode sm) {
   glViewport(0, 0, _instance->_width, _instance->_height);
 }
 
+double renderer::get_screen_aspect() {
+  return static_cast<double>(get_screen_width()) / static_cast<double>(get_screen_height());
+}
+
 // Initialises the renderer
 bool renderer::initialise(const std::string &title, renderer::ScreenMode sm, unsigned int width, unsigned int height) {
   renderer::_clear_r = 0.0f;
