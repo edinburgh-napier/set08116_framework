@@ -30,7 +30,13 @@ effect::effect() : _program(-1) {}
 // Adds a shader to the effect object
 void effect::add_shader(const std::string &filename, GLenum type) throw(...) {
   // Check file exists
-  assert(check_file_exists(filename));
+  if (!check_file_exists(filename)) {
+    // Failed to read file.  Display error
+    std::cerr << "ERROR - could not load shader " << filename << std::endl;
+    std::cerr << "File Does Not Exist" << std::endl;
+    // Throw exception
+    throw std::runtime_error("Error adding shader to effect");
+  }
   // String holding the contents of the shader file
   std::string content;
   // Read in contents - check if file read is OK
@@ -100,8 +106,16 @@ void effect::add_shader(const std::vector<std::string> &filenames, GLenum type) 
   // Check that there is at least one filename
   assert(filenames.size() > 0);
   // Check that each file exists
-  for (auto &name : filenames)
-    check_file_exists(name);
+  for (auto &name : filenames) {
+    if (!check_file_exists(name)) {
+      // Failed to read file.  Display error
+      std::cerr << "ERROR - could not load shader " << name << std::endl;
+      std::cerr << "File Does Not Exist" << std::endl;
+      // Throw exception
+      throw std::runtime_error("Error adding shader to effect");
+    }
+  }
+
   // Holds the contents of the file
   std::vector<std::string> file_contents;
   // Read in the file contents

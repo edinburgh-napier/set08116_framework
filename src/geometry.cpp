@@ -15,12 +15,21 @@ Creates a piece of geometry by loading in a model
 geometry::geometry(const std::string &filename) : geometry() {
 
   // Check that file exists
-  assert(check_file_exists(filename));
+
+  if (!check_file_exists(filename)) {
+    // Failed to read file.  Display error
+    std::cerr << "ERROR - could not load model file " << filename << std::endl;
+    std::cerr << "File Does Not Exist" << std::endl;
+    // Throw exception
+    throw std::runtime_error("Error loading model file");
+  }
+
   // Create model importer
   Assimp::Importer model_importer;
   // Read in the model data
-  auto sc = model_importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_GenSmoothNormals |
-                                                  aiProcess_ValidateDataStructure | aiProcess_FindInvalidData);
+  auto sc = model_importer.ReadFile(filename,
+                                    aiProcess_Triangulate | aiProcess_GenSmoothNormals |
+                                        aiProcess_ValidateDataStructure | aiProcess_FindInvalidData);
   // Check that data has been read in correctly
   if (!sc) {
     // Display error

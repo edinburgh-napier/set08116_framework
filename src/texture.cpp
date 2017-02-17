@@ -29,7 +29,13 @@ texture::texture(const std::string &filename) throw(...) : texture(filename, tru
 // Creates a new texture object from the given file with mipmaps and anisotropic filtering defined
 texture::texture(const std::string &filename, bool mipmaps, bool anisotropic) throw(...) {
   // Check if file exists
-  assert(check_file_exists(filename));
+  if (!check_file_exists(filename)) {
+    // Failed to read file.  Display error
+    std::cerr << "ERROR - could not load texture " << filename << std::endl;
+    std::cerr << "File Does Not Exist" << std::endl;
+    // Throw exception
+    throw std::runtime_error("Error adding texture");
+  }
 
   ILuint ImgId = -1;
   // Generate the main image name to use.
@@ -157,7 +163,13 @@ texture::texture(const std::vector<std::string> &filenames, bool anisotropic) th
   }
 
   for (size_t i = 0; i < filenames.size(); i++) {
-    assert(check_file_exists(filenames[i]));
+    if (!check_file_exists(filenames[i])) {
+      // Failed to read file.  Display error
+      std::cerr << "ERROR - could not load texture " << filenames[i] << std::endl;
+      std::cerr << "File Does Not Exist" << std::endl;
+      // Throw exception
+      throw std::runtime_error("Error adding texture");
+    }
 
     ILuint ImgId = -1;
     // Generate the main image name to use.

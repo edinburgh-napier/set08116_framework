@@ -14,8 +14,15 @@ std::array<GLenum, 6> targets = {GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE
 // Creates a cubemap object from an array of six file names
 cubemap::cubemap(const std::array<std::string, 6> &filenames) throw(...) {
   // Ensure that filenames are valid
-  for (auto &file : filenames)
-    assert(check_file_exists(file));
+  for (auto &file : filenames) {
+    if (!check_file_exists(file)) {
+      // Failed to read file.  Display error
+      std::cerr << "ERROR - could not load cubemap texture " << file << std::endl;
+      std::cerr << "File Does Not Exist" << std::endl;
+      // Throw exception
+      throw std::runtime_error("Error adding cubemap texture");
+    }
+  }
   // Generate cubemap texture and bind
   glGenTextures(1, &_id);
   glBindTexture(GL_TEXTURE_CUBE_MAP, _id);
@@ -120,7 +127,14 @@ bool cubemap::set_texture(GLenum target, const std::string &filename) throw(...)
   // Check that target is valid
   assert(std::find(std::begin(targets), std::end(targets), target) != std::end(targets));
   // Check that filename is valid
-  assert(check_file_exists(filename));
+
+  if (!check_file_exists(filename)) {
+    // Failed to read file.  Display error
+    std::cerr << "ERROR - could not load cubemap texture " << filename << std::endl;
+    std::cerr << "File Does Not Exist" << std::endl;
+    // Throw exception
+    throw std::runtime_error("Error adding cubemap texture");
+  }
 
   // Bind the cubemap texture
   glBindTexture(GL_TEXTURE_CUBE_MAP, _id);
