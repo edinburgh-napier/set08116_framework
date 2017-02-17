@@ -60,6 +60,8 @@ public:
   static unsigned int get_screen_width() { return _instance->_width; }
   // Gets the height of the window used by the renderer
   static unsigned int get_screen_height() { return _instance->_height; }
+  // Returns get_screen_width() / get_screen_height()
+  static double get_screen_aspect();
   // Gets the effect currently bound by the renderer
   static const effect &get_bound_effect() { return _instance->_effect; }
   // Initialises the renderer
