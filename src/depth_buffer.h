@@ -38,6 +38,6 @@ public:
   // Gets the height of the depth buffer
   GLuint get_height() const { return _height; }
   // Saves the depth buffer
-  void save(const std::string &filename) const;
+  void save(const std::string &filename, const bool linear = true) const;
 };
 }
