@@ -3,32 +3,6 @@
 #include "geometry_builder.h"
 
 namespace graphics_framework {
-// Generates tangents and binormals for geometry
-void generate_tb(geometry &geom, const std::vector<glm::vec3> &normals) {
-  // Declare tangent and binormal buffers
-  std::vector<glm::vec3> tangent_data;
-  std::vector<glm::vec3> binormal_data;
-  // Iterate through each normal and generate
-  for (unsigned int i = 0; i < geom.get_vertex_count(); ++i) {
-    // Determine if tangent value.  Get orthogonal with forward and up vectors
-    // Orthogonal to forward vector
-    glm::vec3 c1 = glm::cross(normals[i], glm::vec3(0.0f, 0.0f, 1.0f));
-    // Orthogonal to up vector
-    glm::vec3 c2 = glm::cross(normals[i], glm::vec3(0.0f, 1.0f, 0.0f));
-    // Determine which vector has greater length.  This will be the tangent
-    if (glm::length(c1) > glm::length(c2))
-      tangent_data.push_back(glm::normalize(c1));
-    else
-      tangent_data.push_back(glm::normalize(c2));
-
-    // Generate binormal from tangent and normal
-    binormal_data.push_back(glm::normalize(glm::cross(normals[i], tangent_data[i])));
-  }
-
-  // Add the new buffers to the geometry
-  geom.add_buffer(tangent_data, BUFFER_INDEXES::TANGENT_BUFFER);
-  geom.add_buffer(binormal_data, BUFFER_INDEXES::BINORMAL_BUFFER);
-}
 
 // Data required for box geometry
 glm::vec3 box_positions[] = {
@@ -109,7 +83,7 @@ geometry geometry_builder::create_box(const glm::vec3 &dims) {
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangents and binormals
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   // Return geometry
   return std::move(geom);
@@ -192,7 +166,7 @@ geometry geometry_builder::create_tetrahedron(const glm::vec3 &dims) {
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   // Return geometry
   return std::move(geom);
@@ -277,7 +251,7 @@ geometry geometry_builder::create_pyramid(const glm::vec3 &dims) {
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   // Return geometry
   return std::move(geom);
@@ -345,7 +319,7 @@ geometry geometry_builder::create_disk(const unsigned int slices, const glm::vec
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   // Return geometry
   return std::move(geom);
@@ -521,7 +495,7 @@ geometry geometry_builder::create_cylinder(const unsigned int stacks, const unsi
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   return std::move(geom);
 }
@@ -621,7 +595,7 @@ geometry geometry_builder::create_sphere(const unsigned int stacks, const unsign
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   return std::move(geom);
 }
@@ -735,7 +709,7 @@ geometry geometry_builder::create_torus(const unsigned int stacks, const unsigne
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   return std::move(geom);
 }
@@ -807,7 +781,7 @@ geometry geometry_builder::create_plane(const unsigned int width, const unsigned
   geom.add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
 
   // Generate tangent and binormal data
-  generate_tb(geom, normals);
+  geom.generate_tb(normals);
 
   return std::move(geom);
 }

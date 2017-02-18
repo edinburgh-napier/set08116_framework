@@ -96,5 +96,7 @@ public:
   glm::vec3 get_maximal_point() const { return _maximal; }
   // Sets the maximal point of the geometry
   void set_maximal_point(const glm::vec3 &value) { _maximal = value; }
+  // Recalualte tangent and binormal buffers
+  void generate_tb(const std::vector<glm::vec3> &normals);
 };
 }

@@ -104,15 +104,20 @@ geometry::geometry(const std::string &filename) : geometry() {
   // Add the buffers to the geometry
   add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
   add_buffer(colours, BUFFER_INDEXES::COLOUR_BUFFER);
-  if (normals.size() != 0)
+  if (normals.size() != 0) {
     add_buffer(normals, BUFFER_INDEXES::NORMAL_BUFFER);
-  if (tex_coords.size() != 0)
+    generate_tb(normals);
+  }
+  if (tex_coords.size() != 0) {
     add_buffer(tex_coords, BUFFER_INDEXES::TEXTURE_COORDS_0);
-  if (indices.size() != 0)
+  }
+  if (indices.size() != 0) {
     add_index_buffer(indices);
-
+  }
   // Log success
-  std::clog << "LOG - geometry " << filename << " loaded" << std::endl;
+  std::clog << "LOG - geometry " << filename << " loaded "
+            << (normals.size() ? "With normals & " : "With no normals & ")
+            << (tex_coords.size() ? "With UVs" : "With no UVs") << std::endl;
 }
 
 // Move constructor
@@ -305,5 +310,33 @@ bool geometry::add_index_buffer(const std::vector<GLuint> &buffer) {
     return false;
   }
   return true;
+}
+
+// Generates tangents and binormals for geometry
+void geometry::generate_tb(const std::vector<glm::vec3> &normals) {
+  // Declare tangent and binormal buffers
+  std::vector<glm::vec3> tangent_data;
+  std::vector<glm::vec3> binormal_data;
+  // Iterate through each normal and generate
+  for (unsigned int i = 0; i < this->get_vertex_count(); ++i) {
+    // Determine if tangent value.  Get orthogonal with forward and up vectors
+    // Orthogonal to forward vector
+    glm::vec3 c1 = glm::cross(normals[i], glm::vec3(0.0f, 0.0f, 1.0f));
+    // Orthogonal to up vector
+    glm::vec3 c2 = glm::cross(normals[i], glm::vec3(0.0f, 1.0f, 0.0f));
+    // Determine which vector has greater length.  This will be the tangent
+    if (glm::length(c1) > glm::length(c2)) {
+      tangent_data.push_back(glm::normalize(c1));
+    } else {
+      tangent_data.push_back(glm::normalize(c2));
+    }
+
+    // Generate binormal from tangent and normal
+    binormal_data.push_back(glm::normalize(glm::cross(normals[i], tangent_data[i])));
+  }
+
+  // Add the new buffers to the geometry
+  this->add_buffer(tangent_data, BUFFER_INDEXES::TANGENT_BUFFER);
+  this->add_buffer(binormal_data, BUFFER_INDEXES::BINORMAL_BUFFER);
 }
 }
