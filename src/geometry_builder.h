@@ -27,6 +27,6 @@ public:
   static geometry create_torus(const unsigned int stacks = 10, const unsigned int slices = 10,
                                const float ring_radius = 1.0f, const float outer_radius = 3.0f);
   // Creates plane geometry
-  static geometry create_plane(const unsigned int width = 100, const unsigned int depth = 100);
+  static geometry create_plane(const unsigned int width = 100, const unsigned int depth = 100, const bool subdivide = false);
 };
 }

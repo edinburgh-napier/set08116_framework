@@ -25,7 +25,11 @@ struct shadow_map {
 
   // Gets the view matrix for this shadow map
   glm::mat4 get_view() const {
-    return glm::lookAt(light_position, light_position + light_dir, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    if (glm::normalize(light_dir) == -up || glm::normalize(light_dir) == up) {
+      up = glm::vec3(1.0f, 0.0f, 0.0f);
+    }
+    return glm::lookAt(light_position, light_position + light_dir, up);
   }
 };
 }
