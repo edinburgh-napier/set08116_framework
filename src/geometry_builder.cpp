@@ -715,7 +715,7 @@ geometry geometry_builder::create_torus(const unsigned int stacks, const unsigne
 }
 
 // Create plane geometry
-geometry geometry_builder::create_plane(const unsigned int width, const unsigned int depth) {
+geometry geometry_builder::create_plane(const unsigned int width, const unsigned int depth, const bool subdivide) {
   // Type of geometry generated will be triangles
   geometry geom;
   geom.set_type(GL_TRIANGLES);
@@ -729,50 +729,81 @@ geometry geometry_builder::create_plane(const unsigned int width, const unsigned
   // Minimal and maximal points
   glm::vec3 minimal(0.0f, 0.0f, 0.0f);
   glm::vec3 maximal(0.0f, 0.0f, 0.0f);
+  const float extents_w = static_cast<float>(width) / 2.0f;
+  const float extents_d = static_cast<float>(width) / 2.0f;
 
-  // Iterate through each vertex and add to geometry
-  std::array<glm::vec3, 4> verts;
-  for (unsigned int x = 0; x < width; ++x) {
-    for (unsigned int z = 0; z < depth; ++z) {
-      // Calculate vertex positions
-      verts[0] = glm::vec3(-static_cast<float>(width) / 2.0f + x, 0.0f, static_cast<float>(depth) / 2.0f - z);
-      verts[1] = glm::vec3(-static_cast<float>(width) / 2.0f + (x + 1), 0.0f, static_cast<float>(depth) / 2.0f - z);
-      verts[2] = glm::vec3(-static_cast<float>(width) / 2.0f + x, 0.0f, static_cast<float>(depth) / 2.0f - (z + 1));
-      verts[3] =
-          glm::vec3(-static_cast<float>(width) / 2.0f + (x + 1), 0.0f, static_cast<float>(depth) / 2.0f - (z + 1));
+  if (!subdivide) {
+    minimal = glm::vec3(-extents_w, 0, -extents_d);
+    maximal = glm::vec3(extents_w, 0, extents_d);
+    // Triangle 1
+    positions.push_back(glm::vec3(extents_w, 0, extents_d));
+    tex_coords.push_back(glm::vec2(extents_w, extents_d));
+    positions.push_back(glm::vec3(extents_w, 0, -extents_d));
+    tex_coords.push_back(glm::vec2(extents_w, 0));
+    positions.push_back(glm::vec3(-extents_w, 0, -extents_d));
+    tex_coords.push_back(glm::vec2(0, 0));
+    // Triangle 2
+    positions.push_back(glm::vec3(-extents_w, 0, -extents_d));
+    tex_coords.push_back(glm::vec2(0, -0));
+    positions.push_back(glm::vec3(-extents_w, 0, extents_d));
+    tex_coords.push_back(glm::vec2(0, extents_d));
+    positions.push_back(glm::vec3(extents_w, 0, extents_d));
+    tex_coords.push_back(glm::vec2(extents_w, extents_d));
+    // Add normals and colours
+    for (unsigned int i = 0; i < 6; ++i) {
+      normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+      colours.push_back(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+    }
+  } else {
 
-      // Recalculate minimal and maximal
-      for (auto &v : verts) {
-        minimal = glm::min(minimal, v);
-        maximal = glm::max(maximal, v);
-      }
+    // Iterate through each vertex and add to geometry
+    normals.reserve(6 * width * depth);
+    colours.reserve(6 * width * depth);
+    positions.reserve(6 * width * depth);
+    tex_coords.reserve(6 * width * depth);
 
-      // Triangle 1
-      positions.push_back(verts[0]);
-      tex_coords.push_back(glm::vec2(x, z) / 10.0f);
-      positions.push_back(verts[3]);
-      tex_coords.push_back(glm::vec2(x + 1, z + 1) / 10.0f);
-      positions.push_back(verts[2]);
-      tex_coords.push_back(glm::vec2(x, z + 1) / 10.0f);
-      // Triangle 2
-      positions.push_back(verts[0]);
-      tex_coords.push_back(glm::vec2(x, z) / 10.0f);
-      positions.push_back(verts[1]);
-      tex_coords.push_back(glm::vec2(x + 1, z) / 10.0f);
-      positions.push_back(verts[3]);
-      tex_coords.push_back(glm::vec2(x + 1, z + 1) / 10.0f);
+    std::array<glm::vec3, 4> verts;
+    for (unsigned int x = 0; x < width; ++x) {
+      for (unsigned int z = 0; z < depth; ++z) {
+        // Calculate vertex positions
+        verts[0] = glm::vec3(-extents_w / 2.0f + x, 0.0f, extents_d / 2.0f - z);
+        verts[1] = glm::vec3(-extents_w / 2.0f + (x + 1), 0.0f, extents_d / 2.0f - z);
+        verts[2] = glm::vec3(-extents_w / 2.0f + x, 0.0f, extents_d / 2.0f - (z + 1));
+        verts[3] = glm::vec3(-extents_w / 2.0f + (x + 1), 0.0f, extents_d / 2.0f - (z + 1));
 
-      // Add normals and colours
-      for (unsigned int i = 0; i < 6; ++i) {
-        normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
-        colours.push_back(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+        // Recalculate minimal and maximal
+        for (auto &v : verts) {
+          minimal = glm::min(minimal, v);
+          maximal = glm::max(maximal, v);
+        }
+
+        // Triangle 1
+        positions.push_back(verts[0]);
+        tex_coords.push_back(glm::vec2(x, z) / 10.0f);
+        positions.push_back(verts[3]);
+        tex_coords.push_back(glm::vec2(x + 1, z + 1) / 10.0f);
+        positions.push_back(verts[2]);
+        tex_coords.push_back(glm::vec2(x, z + 1) / 10.0f);
+        // Triangle 2
+        positions.push_back(verts[0]);
+        tex_coords.push_back(glm::vec2(x, z) / 10.0f);
+        positions.push_back(verts[1]);
+        tex_coords.push_back(glm::vec2(x + 1, z) / 10.0f);
+        positions.push_back(verts[3]);
+        tex_coords.push_back(glm::vec2(x + 1, z + 1) / 10.0f);
+
+        // Add normals and colours
+        for (unsigned int i = 0; i < 6; ++i) {
+          normals.push_back(glm::vec3(0.0f, 1.0f, 0.0f));
+          colours.push_back(glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+        }
       }
     }
-  }
 
-  // Set minimal and maximal values
-  geom.set_minimal_point(minimal);
-  geom.set_maximal_point(maximal);
+    // Set minimal and maximal values
+    geom.set_minimal_point(minimal);
+    geom.set_maximal_point(maximal);
+  }
 
   // Add buffers to geometry
   geom.add_buffer(positions, BUFFER_INDEXES::POSITION_BUFFER);
