@@ -297,7 +297,7 @@ texture::texture(const std::vector<glm::vec4> &data, GLuint width, GLuint height
     CHECK_GL_ERROR; // Non-fatal
 
     // Add texture data
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, 0, GL_RGBA, GL_FLOAT, &data[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_FLOAT, &data[0]);
     // Check error
     if (CHECK_GL_ERROR) {
       // Display error
