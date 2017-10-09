@@ -1,30 +1,23 @@
-cmake_minimum_required(VERSION 3.3)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-project(enu_graphics_framework)
-SET(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
-foreach (config ${CMAKE_CONFIGURATION_TYPES})
-  string (TOUPPER ${config} config)
-  set_target_properties(${_project} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}"
-    ARCHIVE_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}"
-    LIBRARY_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}"
-    #PDB_OUTPUT_DIRECTORY_${config} ${sym_path}
-    VS_INTERMEDIATE_DIRECTORY_${config} "temp"
-  )
-  SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
-  SET( CMAKE_RUNTIME_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
-  SET( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
-  SET( CMAKE_LIBRARY_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
-  SET( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
-  SET( CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${config} "${OUTPUT_DIRECTORY}/${config}")
-  SET( VS_INTERMEDIATE_DIRECTORY_${config} "temp/${config}")
-  link_directories("${OUTPUT_DIRECTORY}/${config}")
-endforeach ()
+cmake_minimum_required(VERSION 3.9)
+# Compiler flags
+if (MSVC)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /EHsc" CACHE INTERNAL "" FORCE)
+endif(MSVC)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+project(enu_graphics_framework)
+
+
+#### Setup Directories ####
+#Main output directory
+SET(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
+# Ouput all DLLs from all libs into main build folder
+SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
+SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+link_directories("${CMAKE_BINARY_DIR}/lib")
 option(ENU_GFX_TEST "MyOption" OFF)
 
-include(DownloadProject.cmake)
 #GLFW options
 option(GLFW_BUILD_DOCS "" OFF)
 option(GLFW_BUILD_EXAMPLES "" OFF)
@@ -104,89 +97,68 @@ set(ASSIMP_BUILD_3D_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_GLTF_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "" FORCE)
+set(BuildTests OFF CACHE BOOL "" FORCE)
+set(IL_TESTS OFF CACHE BOOL "" FORCE)
+set(IL_BUILD_ILUT OFF CACHE BOOL "" FORCE)
+#todo tell IL to calm down and not parse everything
 
 #====================================================================
-download_project(PROJ zlib
-  GIT_REPOSITORY      https://github.com/madler/zlib
-  GIT_TAG             2fa463b
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
-include_directories(${zlib_SOURCE_DIR} ${zlib_BINARY_DIR})
+#### Add External Dependencies ####
+# ZLIB https://github.com/madler/zlib
+add_subdirectory("lib/zlib")
+include_directories("lib/zlib")
+include_directories("${CMAKE_BINARY_DIR}/lib/zlib")
+link_directories("${CMAKE_BINARY_DIR}/lib/zlib")
 SET(ZLIB_FOUND 1)
 #This is for assimp
 SET(ZLIB_LIBRARIES zlib)
 #This is for libpng
 SET(ZLIB_LIBRARY zlib)
-SET(ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
-  
-download_project(PROJ glfw
-  GIT_REPOSITORY      https://github.com/glfw/glfw.git
-  GIT_TAG             0f488ac
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-include_directories("${glfw_SOURCE_DIR}/include")
-
-download_project(PROJ glew
-  GIT_REPOSITORY      https://github.com/Perlmint/glew-cmake.git
-  GIT_TAG             7be0923
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${glew_SOURCE_DIR} ${glew_BINARY_DIR})
-include_directories("${glew_SOURCE_DIR}/include")
-
-download_project(PROJ glm
-  GIT_REPOSITORY      https://github.com/g-truc/glm.git
-  GIT_TAG             6a1e2ec
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${glm_SOURCE_DIR} ${glm_BINARY_DIR})
-include_directories("${glm_SOURCE_DIR}")
-
-download_project(PROJ assimp
-  GIT_REPOSITORY      https://github.com/assimp/assimp
-  GIT_TAG             a8673d4
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${assimp_SOURCE_DIR} ${assimp_BINARY_DIR})
-include_directories("${assimp_SOURCE_DIR}/include")
-
-download_project(PROJ libpng
-  GIT_REPOSITORY      https://github.com/glennrp/libpng.git
-  GIT_TAG             f981826
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${libpng_SOURCE_DIR} ${libpng_BINARY_DIR})
-include_directories("${libpng_SOURCE_DIR}")
-
-SET(PNG_INCLUDE_DIRS ${libpng_SOURCE_DIR} ${libpng_BINARY_DIR} CACHE STRING "")
+SET(ZLIB_INCLUDE_DIR"lib/zlib")
+#================================================
+# GLFW https://github.com/glfw/glfw.git
+add_subdirectory("lib/glfw")
+include_directories("lib/glfw/include/GLFW")
+link_directories("${CMAKE_BINARY_DIR}/lib/glfw")
+#================================================
+# GLEW https://github.com/Perlmint/glew-cmake.git
+add_subdirectory("lib/glew")
+include_directories("lib/glew")
+link_directories("${CMAKE_BINARY_DIR}/lib/glew")
+#================================================
+# GLM https://github.com/g-truc/glm.git
+add_subdirectory("lib/glm")
+include_directories("lib/glm")
+link_directories("${CMAKE_BINARY_DIR}/lib/glm")
+#================================================
+# assimp https://github.com/assimp/assimp
+add_subdirectory("lib/assimp")
+include_directories("lib/assimp")
+link_directories("${CMAKE_BINARY_DIR}/lib/assimp")
+#================================================
+# libpng https://github.com/glennrp/libpng.git
+add_subdirectory("lib/libpng")
+include_directories("lib/libpng")
+link_directories("${CMAKE_BINARY_DIR}/lib/libpng")
+SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_BINARY_DIR}/lib/libpng" CACHE STRING "")
 SET(PNG_LIBRARIES png CACHE STRING "")
 SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
-
-download_project(PROJ libjpeg
-  GIT_REPOSITORY      https://github.com/dooglz/libjpeg.git
-  GIT_TAG             204c83c449
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-add_subdirectory(${libjpeg_SOURCE_DIR} ${libjpeg_BINARY_DIR})
-include_directories("${libjpeg_SOURCE_DIR}")
-
-SET(JPEG_INCLUDE_DIRS ${libjpeg_SOURCE_DIR} ${libjpeg_BINARY_DIR} CACHE STRING "" FORCE)
+#================================================
+# libjpeg https://github.com/dooglz/libjpeg.git
+add_subdirectory("lib/libjpeg")
+include_directories("lib/libjpeg")
+link_directories("${CMAKE_BINARY_DIR}/lib/libjpeg")
+SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_BINARY_DIR}/lib/libjpeg" CACHE STRING "" FORCE)
 SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
 SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
-
-download_project(PROJ devil
-  GIT_REPOSITORY      https://github.com/dooglz/DevIL.git
-  GIT_TAG             7129e65
-  ${UPDATE_DISCONNECTED_IF_AVAILABLE}
-)
-
-add_subdirectory("${devil_SOURCE_DIR}/DevIL/" ${devil_BINARY_DIR})
-include_directories("${devil_SOURCE_DIR}/DevIL/include")
+#================================================
+# devil https://github.com/DentonW/DevIL.git
+add_subdirectory("lib/devil/DevIL")
+include_directories("lib/devil/DevIL")
+link_directories("${CMAKE_BINARY_DIR}/lib/devil")
 #====================================================================
 
-link_directories("${glew_BINARY_DIR}/../lib/")
+
 
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 if(ENU_GFX_TEST)
@@ -222,13 +194,13 @@ else()
   target_link_libraries(enu_graphics_framework glfw assimp DevIL zlibd optimized glew_shared debug glewd)
 endif()
 
-set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
+#set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 add_dependencies(png zlib)
 add_dependencies(assimp zlib)
-add_dependencies(IL png jpeg zlib)
+#add_dependencies(IL png jpeg zlib)
 add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL ILU)
-get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
+#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+#set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 
 set_target_properties(glfw PROPERTIES FOLDER "DEPS")
 set_target_properties(zlib PROPERTIES FOLDER "DEPS")
@@ -246,7 +218,7 @@ set_target_properties(glm_dummy PROPERTIES FOLDER "JUNK")
 set_target_properties(example PROPERTIES FOLDER "JUNK")
 set_target_properties(minigzip PROPERTIES FOLDER "JUNK")
 set_target_properties(zlibstatic PROPERTIES FOLDER "JUNK")
-set_target_properties(ILUT PROPERTIES FOLDER "JUNK")
+
 
 set(deps glfw zlib jpeg png IL ILU pngfix png-fix-itxt assimp)
 

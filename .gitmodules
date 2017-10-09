@@ -1,0 +1,24 @@
+[submodule "lib/zlib"]
+	path = lib/zlib
+	url = https://github.com/madler/zlib
+[submodule "lib/glfw"]
+	path = lib/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "lib/glew"]
+	path = lib/glew
+	url = https://github.com/Perlmint/glew-cmake.git
+[submodule "lib/glm"]
+	path = lib/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "lib/assimp"]
+	path = lib/assimp
+	url = https://github.com/assimp/assimp
+[submodule "lib/libpng"]
+	path = lib/libpng
+	url = https://github.com/glennrp/libpng.git
+[submodule "lib/libjpeg"]
+	path = lib/libjpeg
+	url = https://github.com/dooglz/libjpeg.git
+[submodule "lib/devil"]
+	path = lib/devil
+	url = https://github.com/DentonW/DevIL.git
