@@ -123,7 +123,7 @@ link_directories("${CMAKE_BINARY_DIR}/lib/glfw")
 #================================================
 # GLEW https://github.com/Perlmint/glew-cmake.git
 add_subdirectory("lib/glew")
-include_directories("lib/glew")
+include_directories("lib/glew/include")
 link_directories("${CMAKE_BINARY_DIR}/lib/glew")
 #================================================
 # GLM https://github.com/g-truc/glm.git
@@ -133,7 +133,8 @@ link_directories("${CMAKE_BINARY_DIR}/lib/glm")
 #================================================
 # assimp https://github.com/assimp/assimp
 add_subdirectory("lib/assimp")
-include_directories("lib/assimp")
+include_directories("lib/assimp/include")
+include_directories("${CMAKE_BINARY_DIR}/lib/assimp/include")
 link_directories("${CMAKE_BINARY_DIR}/lib/assimp")
 #================================================
 # libpng https://github.com/glennrp/libpng.git
@@ -154,7 +155,7 @@ SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
 #================================================
 # devil https://github.com/DentonW/DevIL.git
 add_subdirectory("lib/devil/DevIL")
-include_directories("lib/devil/DevIL")
+include_directories("lib/devil/DevIL/include")
 link_directories("${CMAKE_BINARY_DIR}/lib/devil")
 #====================================================================
 
@@ -212,7 +213,7 @@ set_target_properties(pngfix PROPERTIES FOLDER "DEPS")
 set_target_properties(genfiles PROPERTIES FOLDER "DEPS")
 set_target_properties(png-fix-itxt PROPERTIES FOLDER "DEPS")
 
-set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "JUNK")
+#set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "JUNK")
 set_target_properties(uninstall PROPERTIES FOLDER "JUNK")
 set_target_properties(glm_dummy PROPERTIES FOLDER "JUNK")
 set_target_properties(example PROPERTIES FOLDER "JUNK")
