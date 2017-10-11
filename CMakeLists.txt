@@ -107,7 +107,7 @@ set(IL_BUILD_ILUT OFF CACHE BOOL "" FORCE)
 # ZLIB https://github.com/madler/zlib cacf7f1
 add_subdirectory("lib/zlib")
 include_directories("lib/zlib")
-include_directories("${CMAKE_BINARY_DIR}/lib/zlib")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
 link_directories("${CMAKE_BINARY_DIR}/lib/zlib")
 SET(ZLIB_FOUND 1)
 #This is for assimp
@@ -119,12 +119,10 @@ SET(ZLIB_INCLUDE_DIR"lib/zlib")
 # GLFW https://github.com/glfw/glfw.git 56ecd62f
 add_subdirectory("lib/glfw")
 include_directories("lib/glfw/include/")
-#link_directories("${CMAKE_BINARY_DIR}/lib/glfw")
 #================================================
 # GLEW https://github.com/Perlmint/glew-cmake.git ea68a21
 add_subdirectory("lib/glew")
 include_directories("lib/glew/include")
-#link_directories("${CMAKE_BINARY_DIR}/lib/glew")
 set_target_properties(libglew_shared PROPERTIES
   RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
@@ -134,27 +132,23 @@ set_target_properties(libglew_shared PROPERTIES
 # GLM https://github.com/g-truc/glm.git 77332664
 add_subdirectory("lib/glm")
 include_directories("lib/glm")
-#link_directories("${CMAKE_BINARY_DIR}/lib/glm")
 #================================================
 # assimp https://github.com/assimp/assimp 114c48b
 add_subdirectory("lib/assimp")
 include_directories("lib/assimp/include")
-include_directories("${CMAKE_BINARY_DIR}/lib/assimp/include")
-#link_directories("${CMAKE_BINARY_DIR}/lib/assimp")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include")
 #================================================
 # libpng https://github.com/glennrp/libpng.git c1effe1bb
 add_subdirectory("lib/libpng")
 include_directories("lib/libpng")
-#link_directories("${CMAKE_BINARY_DIR}/lib/libpng")
-SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_BINARY_DIR}/lib/libpng" CACHE STRING "")
+SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng" CACHE STRING "")
 SET(PNG_LIBRARIES png CACHE STRING "")
 SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
 #================================================
 # libjpeg https://github.com/dooglz/libjpeg.git
 add_subdirectory("lib/libjpeg")
 include_directories("lib/libjpeg")
-#link_directories("${CMAKE_BINARY_DIR}/lib/libjpeg")
-SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_BINARY_DIR}/lib/libjpeg" CACHE STRING "" FORCE)
+SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg" CACHE STRING "" FORCE)
 SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
 SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
 #================================================
@@ -163,7 +157,6 @@ add_subdirectory("lib/devil/DevIL")
 include_directories("lib/devil/DevIL/include")
 set(IL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} CACHE PATH "Output location for Devil .dlls/.so" FORCE)
 set(IL_LIBRARY_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} CACHE PATH "Output location for Devil .libs" FORCE)
-#link_directories("${CMAKE_BINARY_DIR}/lib/devil/DevIL/lib/x64" "${CMAKE_BINARY_DIR}/lib/devil/DevIL/lib/x86")
 
 #================================================
 # OpenGL
