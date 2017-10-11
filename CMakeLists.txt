@@ -141,14 +141,16 @@ include_directories("${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include")
 # libpng https://github.com/glennrp/libpng.git c1effe1bb
 add_subdirectory("lib/libpng")
 include_directories("lib/libpng")
-SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng" CACHE STRING "")
+SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng" CACHE PATH "")
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/lib/libpng")
 SET(PNG_LIBRARIES png CACHE STRING "")
 SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
 #================================================
 # libjpeg https://github.com/dooglz/libjpeg.git
 add_subdirectory("lib/libjpeg")
 include_directories("lib/libjpeg")
-SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg" CACHE STRING "" FORCE)
+SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg" CACHE PATH "" FORCE)
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg")
 SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
 SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
 #================================================
