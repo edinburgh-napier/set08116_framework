@@ -36,12 +36,12 @@ bool load_content() {
   geom4 = geometry_builder::create_box();
 
   // Load in model
-  auto src = "../../assimp-src/test/models/OBJ/box.obj";
+  auto src = "box.obj";
   geom3 = geometry(src);
 
-  src = "../../assimp-src/test/models/LWO/LWO2/uvtest.png";
+  src = "textures/sahara_lf.jpg";
   tpng = texture(src, true, false);
-  src = "../../assimp-src/test/models/OBJ/engineflare1.jpg";
+  src = "textures/sahara_lf.jpg";
   tjpg = texture(src, false, false);
 
   array<string, 6> filenames = {"textures/sahara_ft.jpg", "textures/sahara_bk.jpg", "textures/sahara_up.jpg",
@@ -139,7 +139,7 @@ bool render() {
                      value_ptr(P * V * translate(mat4(), vec3(0, -10.0f, 0)) * scale(mat4(), vec3(20.0f))));
   renderer::render(geom);
 
-  // glDisable(GL_DEPTH_TEST);
+   glDisable(GL_DEPTH_TEST);
   // glDepthMask(GL_FALSE);
   glDisable(GL_CULL_FACE);
 

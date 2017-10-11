@@ -11,11 +11,11 @@ project(enu_graphics_framework)
 
 #### Setup Directories ####
 #Main output directory
-SET(OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/")
 # Ouput all DLLs from all libs into main build folder
-SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
-SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-link_directories("${CMAKE_BINARY_DIR}/lib")
+SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/bin")
+SET (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/lib")
+SET (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/lib")
+link_directories(${CMAKE_ARCHIVE_OUTPUT_DIRECTORY} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 option(ENU_GFX_TEST "MyOption" OFF)
 
 #GLFW options
@@ -118,29 +118,34 @@ SET(ZLIB_INCLUDE_DIR"lib/zlib")
 #================================================
 # GLFW https://github.com/glfw/glfw.git
 add_subdirectory("lib/glfw")
-include_directories("lib/glfw/include/GLFW")
-link_directories("${CMAKE_BINARY_DIR}/lib/glfw")
+include_directories("lib/glfw/include/")
+#link_directories("${CMAKE_BINARY_DIR}/lib/glfw")
 #================================================
 # GLEW https://github.com/Perlmint/glew-cmake.git
 add_subdirectory("lib/glew")
 include_directories("lib/glew/include")
-link_directories("${CMAKE_BINARY_DIR}/lib/glew")
+#link_directories("${CMAKE_BINARY_DIR}/lib/glew")
+set_target_properties(libglew_shared PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+)
 #================================================
 # GLM https://github.com/g-truc/glm.git
 add_subdirectory("lib/glm")
 include_directories("lib/glm")
-link_directories("${CMAKE_BINARY_DIR}/lib/glm")
+#link_directories("${CMAKE_BINARY_DIR}/lib/glm")
 #================================================
 # assimp https://github.com/assimp/assimp
 add_subdirectory("lib/assimp")
 include_directories("lib/assimp/include")
 include_directories("${CMAKE_BINARY_DIR}/lib/assimp/include")
-link_directories("${CMAKE_BINARY_DIR}/lib/assimp")
+#link_directories("${CMAKE_BINARY_DIR}/lib/assimp")
 #================================================
 # libpng https://github.com/glennrp/libpng.git
 add_subdirectory("lib/libpng")
 include_directories("lib/libpng")
-link_directories("${CMAKE_BINARY_DIR}/lib/libpng")
+#link_directories("${CMAKE_BINARY_DIR}/lib/libpng")
 SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_BINARY_DIR}/lib/libpng" CACHE STRING "")
 SET(PNG_LIBRARIES png CACHE STRING "")
 SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
@@ -148,7 +153,7 @@ SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
 # libjpeg https://github.com/dooglz/libjpeg.git
 add_subdirectory("lib/libjpeg")
 include_directories("lib/libjpeg")
-link_directories("${CMAKE_BINARY_DIR}/lib/libjpeg")
+#link_directories("${CMAKE_BINARY_DIR}/lib/libjpeg")
 SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_BINARY_DIR}/lib/libjpeg" CACHE STRING "" FORCE)
 SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
 SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
@@ -156,52 +161,56 @@ SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
 # devil https://github.com/DentonW/DevIL.git
 add_subdirectory("lib/devil/DevIL")
 include_directories("lib/devil/DevIL/include")
-link_directories("${CMAKE_BINARY_DIR}/lib/devil")
+set(IL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} CACHE PATH "Output location for Devil .dlls/.so" FORCE)
+set(IL_LIBRARY_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} CACHE PATH "Output location for Devil .libs" FORCE)
+#link_directories("${CMAKE_BINARY_DIR}/lib/devil/DevIL/lib/x64" "${CMAKE_BINARY_DIR}/lib/devil/DevIL/lib/x86")
+
+#================================================
+# OpenGL
+FIND_PACKAGE( OpenGL REQUIRED)
+if(NOT ${OPENGL_FOUND})
+  message(FATAL_ERROR "OPENGL NOT FOUND")
+endif()
 #====================================================================
 
-
-
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
-if(ENU_GFX_TEST)
-  add_executable(enu_graphics_framework ${SOURCE_FILES})
-else()
-  list(REMOVE_ITEM SOURCE_FILES "src/main.cpp")
-  include (GenerateExportHeader)
-  add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
+include (GenerateExportHeader)
+add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
   GENERATE_EXPORT_HEADER( enu_graphics_framework
-                           BASE_NAME enu_graphics_framework
-                           EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
-                           EXPORT_FILE_NAME enu_graphics_framework_Export.h
-                           STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
-  )
+  BASE_NAME enu_graphics_framework
+  EXPORT_MACRO_NAME enu_graphics_framework_EXPORT
+  EXPORT_FILE_NAME enu_graphics_framework_Export.h
+  STATIC_DEFINE enu_graphics_framework_BUILT_AS_STATIC
+)
+
+#====================================================================
+
+option(ENU_GFX_TEST "build framework test .exe" ON)
+if(ENU_GFX_TEST)
+  add_executable(framework_test "test/test.cpp")
+  include_directories("src/")
+  target_link_libraries(framework_test enu_graphics_framework)
 endif()
 
-FIND_PACKAGE( OpenGL REQUIRED)
-if(${OPENGL_FOUND})
-  target_link_libraries(enu_graphics_framework ${OPENGL_gl_LIBRARY}  )
-else()
-  message("OPENGL NOT FOUND")
-endif()
+#====================================================================
 
 add_custom_command(TARGET enu_graphics_framework POST_BUILD 
-                    COMMAND ${CMAKE_COMMAND} -E copy_directory  
-                    "${PROJECT_SOURCE_DIR}/res"
-                    $<TARGET_FILE_DIR:enu_graphics_framework>)           
+  COMMAND ${CMAKE_COMMAND} -E copy_directory  
+  "${PROJECT_SOURCE_DIR}/res"
+   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}   
+)      
+#====================================================================
 
 if(${MSVC})
-  target_compile_options(enu_graphics_framework PUBLIC /MP)
-  target_link_libraries(enu_graphics_framework glfw3dll assimp DevIL ILU zlibd optimized libglew_shared debug libglew_sharedd)
+  target_link_libraries(enu_graphics_framework ${OPENGL_gl_LIBRARY} glfw3dll assimp IL ILU zlibd optimized libglew_shared debug libglew_sharedd)
 else()
-  target_link_libraries(enu_graphics_framework glfw assimp DevIL zlibd optimized glew_shared debug glewd)
+  target_link_libraries(enu_graphics_framework ${OPENGL_gl_LIBRARY} glfw assimp IL zlibd optimized glew_shared debug glewd)
 endif()
 
-#set_target_properties(libglew_shared PROPERTIES FOLDER "GLEW")
 add_dependencies(png zlib)
 add_dependencies(assimp zlib)
-#add_dependencies(IL png jpeg zlib)
+add_dependencies(IL png jpeg zlib)
 add_dependencies(enu_graphics_framework libglew_shared glfw glm assimp IL ILU)
-#get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
-#set(enu_graphics_framework_incs ${dirs} PARENT_SCOPE)
 
 set_target_properties(glfw PROPERTIES FOLDER "DEPS")
 set_target_properties(zlib PROPERTIES FOLDER "DEPS")
@@ -211,9 +220,9 @@ set_target_properties(jpeg PROPERTIES FOLDER "DEPS")
 set_target_properties(ILU PROPERTIES FOLDER "DEPS")
 set_target_properties(pngfix PROPERTIES FOLDER "DEPS")
 set_target_properties(genfiles PROPERTIES FOLDER "DEPS")
-set_target_properties(png-fix-itxt PROPERTIES FOLDER "DEPS")
+set_target_properties(libglew_shared PROPERTIES FOLDER "DEPS")
 
-#set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "JUNK")
+set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "JUNK")
 set_target_properties(uninstall PROPERTIES FOLDER "JUNK")
 set_target_properties(glm_dummy PROPERTIES FOLDER "JUNK")
 set_target_properties(example PROPERTIES FOLDER "JUNK")
@@ -227,6 +236,7 @@ if(${MSVC})
 #Disable warnings for deps
   FOREACH(dep ${deps})
   target_compile_options(${dep} PUBLIC "/W0")
+  target_compile_options(${dep} PUBLIC "/MP")
   ENDFOREACH()
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/enu_graphics_framework.vcxproj.user" 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>
