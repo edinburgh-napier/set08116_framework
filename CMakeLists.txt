@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(enu_graphics_framework)
 
-
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp src/*.h)
 add_library(enu_graphics_framework STATIC ${SOURCE_FILES})
 target_include_directories(enu_graphics_framework PUBLIC src)
@@ -117,7 +116,6 @@ SET(ZLIB_LIBRARIES zlib)
 SET(ZLIB_LIBRARY zlib)
 SET(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/zlib/")
 set(PNG_BUILD_ZLIB ON CACHE BOOL "" FORCE)
-
 #================================================
 # GLFW https://github.com/glfw/glfw.git 56ecd62f
 add_subdirectory("lib/glfw")
@@ -126,11 +124,6 @@ target_include_directories(enu_graphics_framework PUBLIC "lib/glfw/include/")
 # GLEW https://github.com/Perlmint/glew-cmake.git ea68a21
 add_subdirectory("lib/glew")
 target_include_directories(enu_graphics_framework PUBLIC "lib/glew/include")
-#set_target_properties(libglew_shared PROPERTIES
-#  RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-#  ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
-#  LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-#)
 #================================================
 # GLM https://github.com/g-truc/glm.git 77332664
 add_subdirectory("lib/glm")
@@ -144,7 +137,6 @@ target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib"
 #================================================
 # libpng https://github.com/glennrp/libpng.git c1effe1bb
 add_subdirectory("lib/libpng")
-#target_include_directories(enu_graphics_framework PRIVATE "lib/libpng")
 SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng" CACHE PATH "")
 target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng")
 target_include_directories(png PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
@@ -155,7 +147,6 @@ SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
 #================================================
 # libjpeg https://github.com/dooglz/libjpeg.git
 add_subdirectory("lib/libjpeg")
-#(enu_graphics_framework PRIVATE "lib/libjpeg")
 SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg" CACHE PATH "" FORCE)
 target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg")
 SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
@@ -166,8 +157,7 @@ add_subdirectory("lib/devil/DevIL")
 target_include_directories(enu_graphics_framework PRIVATE "lib/devil/DevIL/include")
 target_include_directories(IL PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng")
 target_include_directories(IL PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg")
-#set(IL_RUNTIME_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} CACHE PATH "Output location for Devil .dlls/.so" FORCE)
-#set(IL_LIBRARY_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} CACHE PATH "Output location for Devil .libs" FORCE)
+
 
 #================================================
 # OpenGL
@@ -178,72 +168,49 @@ endif()
 
 #====================================================================
 
-#====================================================================
-
-#target_link_libraries(IL PRVIATE PNG PRVIATE jpeg)
-#target_link_libraries(ILU PRVIATE IL)
 
 target_link_libraries(enu_graphics_framework 
-PUBLIC ${OPENGL_gl_LIBRARY} 
-PUBLIC glfw
-PUBLIC libglew_shared
-PRIVATE assimp 
-PRIVATE ILU 
-PRIVATE zlib
+	PUBLIC ${OPENGL_gl_LIBRARY} 
+	PUBLIC glfw
+	PUBLIC libglew_shared
+	PRIVATE assimp 
+	PRIVATE ILU 
+	PRIVATE zlib
 )
+#====================================================================
+set(junk 
+	pngfix png-fix-itxt IrrXML genfiles uninstall glm_dummy 
+	UpdateAssimpLibsDebugSymbolsAndDLLs example zlibstatic minigzip
+)
+set(deps glfw zlib jpeg png IL ILU assimp libglew_shared)
 
-#set_target_properties(glfw PROPERTIES FOLDER "DEPS")
-#set_target_properties(zlib PROPERTIES FOLDER "DEPS")
-#set_target_properties(IL PROPERTIES FOLDER "DEPS")
-#set_target_properties(png PROPERTIES FOLDER "DEPS")
-#set_target_properties(jpeg PROPERTIES FOLDER "DEPS")
-#set_target_properties(ILU PROPERTIES FOLDER "DEPS")
-#set_target_properties(pngfix PROPERTIES FOLDER "DEPS")
-#set_target_properties(genfiles PROPERTIES FOLDER "DEPS")
-#set_target_properties(libglew_shared PROPERTIES FOLDER "DEPS")
-#
-#set_target_properties(UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTIES FOLDER "JUNK")
-#set_target_properties(uninstall PROPERTIES FOLDER "JUNK")
-#set_target_properties(glm_dummy PROPERTIES FOLDER "JUNK")
-#set_target_properties(example PROPERTIES FOLDER "JUNK")
-#set_target_properties(minigzip PROPERTIES FOLDER "JUNK")
-#set_target_properties(zlibstatic PROPERTIES FOLDER "JUNK")
-
-
-set(deps glfw zlib jpeg png IL ILU pngfix png-fix-itxt assimp libglew_shared)
-
-
-if(${ENU_GFX_TEST})
-
-add_custom_command(TARGET framework_test POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy_directory
-"${PROJECT_SOURCE_DIR}/res"
-"$<TARGET_FILE_DIR:framework_test>")
+FOREACH(jnk ${junk})
+	#Hide junks in junk VS project folder
+	set_target_properties(${jnk} PROPERTIES FOLDER "JUNK")
+ENDFOREACH()
 
 FOREACH(dep ${deps})
-add_custom_command(TARGET framework_test POST_BUILD
-COMMAND ${CMAKE_COMMAND} -E copy_if_different
-$<TARGET_FILE:${dep}>
-$<TARGET_FILE_DIR:framework_test>)
+	#Hide deps in dep VS project folder
+	set_target_properties(${dep} PROPERTIES FOLDER "DEPS")
+	#Disable warnings for deps
+	target_compile_options(${dep} PUBLIC "/W0")
+	#use all core compilation
+	target_compile_options(${dep} PUBLIC "/MP")
 ENDFOREACH()
+
+if(${ENU_GFX_TEST})
+	add_custom_command(TARGET framework_test POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_directory
+		"${PROJECT_SOURCE_DIR}/res"
+		"$<TARGET_FILE_DIR:framework_test>"
+	)
+
+	FOREACH(dep ${deps})
+		add_custom_command(TARGET framework_test POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:${dep}>
+			$<TARGET_FILE_DIR:framework_test>
+		)
+	ENDFOREACH()
 endif()
 
-if(${MSVC})
-#Disable warnings for deps
-  FOREACH(dep ${deps})
-  target_compile_options(${dep} PUBLIC "/W0")
-  target_compile_options(${dep} PUBLIC "/MP")
-  ENDFOREACH()
-file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/enu_graphics_framework.vcxproj.user" 
-    "<?xml version=\"1.0\" encoding=\"utf-8\"?>
-    <Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
-    <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">
-        <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
-        <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    </PropertyGroup>
-    <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">
-        <LocalDebuggerWorkingDirectory>$(TargetDir)</LocalDebuggerWorkingDirectory>
-        <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    </PropertyGroup>
-    </Project>")
- endif()
