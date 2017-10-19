@@ -177,11 +177,7 @@ if(NOT ${OPENGL_FOUND})
 endif()
 
 #====================================================================
-add_custom_command(TARGET enu_graphics_framework POST_BUILD 
-  COMMAND ${CMAKE_COMMAND} -E copy_directory  
-  "${PROJECT_SOURCE_DIR}/res"
-   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}   
-)      
+
 #====================================================================
 
 #target_link_libraries(IL PRVIATE PNG PRVIATE jpeg)
@@ -216,18 +212,27 @@ PRIVATE zlib
 
 set(deps glfw zlib jpeg png IL ILU pngfix png-fix-itxt assimp libglew_shared)
 
+
+if(${ENU_GFX_TEST})
+
+add_custom_command(TARGET framework_test POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy_directory
+"${PROJECT_SOURCE_DIR}/res"
+"$<TARGET_FILE_DIR:framework_test>")
+
+FOREACH(dep ${deps})
+add_custom_command(TARGET framework_test POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy_if_different
+$<TARGET_FILE:${dep}>
+$<TARGET_FILE_DIR:framework_test>)
+ENDFOREACH()
+endif()
+
 if(${MSVC})
 #Disable warnings for deps
   FOREACH(dep ${deps})
   target_compile_options(${dep} PUBLIC "/W0")
   target_compile_options(${dep} PUBLIC "/MP")
-  if(${ENU_GFX_TEST})
-    add_custom_command(TARGET framework_test POST_BUILD 
-               COMMAND ${CMAKE_COMMAND} -E copy_if_different
-               $<TARGET_FILE:${dep}>              
-               $<TARGET_FILE_DIR:framework_test>)
-  endif()
-  
   ENDFOREACH()
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/enu_graphics_framework.vcxproj.user" 
     "<?xml version=\"1.0\" encoding=\"utf-8\"?>

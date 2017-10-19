@@ -1,5 +1,5 @@
 
-#version 440
+#version 410
 // Model view projection matrix
 uniform mat4 MVP;
 

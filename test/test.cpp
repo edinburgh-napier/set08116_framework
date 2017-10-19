@@ -36,8 +36,9 @@ bool load_content() {
   geom2 = geometry_builder::create_plane(10, 10);
   geom4 = geometry_builder::create_box();
 
+
   // Load in model
-  auto src = "box.obj";
+  auto src = "models/box.obj";
   geom3 = geometry(src);
 
   src = "textures/sahara_lf.jpg";

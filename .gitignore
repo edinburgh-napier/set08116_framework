@@ -1,3 +1,4 @@
+
 *.vcxproj
 *.filters
 *.sln
@@ -290,3 +291,6 @@ _Pvt_Extensions
 *VC.db
 src/googletest-build/
 src/googletest-download/
+
+
+!/res/*/*.obj
