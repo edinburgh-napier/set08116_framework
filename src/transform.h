@@ -15,7 +15,7 @@ struct transform {
   glm::vec3 scale;
 
   // Creates a transform object
-  transform() : scale(glm::vec3(1.0f, 1.0f, 1.0f)) {}
+  transform() : scale(glm::vec3(1.0f, 1.0f, 1.0f)), position(0.f), orientation(glm::quat()) {}
 
   // Translates the 3D object
   void translate(const glm::vec3 &translation) { position += translation; }
