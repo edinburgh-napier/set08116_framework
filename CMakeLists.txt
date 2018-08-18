@@ -44,10 +44,6 @@ option(ASSIMP_BUILD_TESTS "" OFF)
 set(LIBRARY_SUFFIX "" CACHE STRING "the suffix for the assimp windows library")
 set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
-#LIBPNG
-set(PNG_TESTS OFF CACHE BOOL "" FORCE)
-set(PNG_STATIC OFF CACHE BOOL "" FORCE)
-set(SKIP_INSTALL_ALL ON CACHE BOOL "" FORCE)
 
 #TODO: go back and enable this, submit bug report
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
@@ -98,9 +94,7 @@ set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_GLTF_IMPORTER OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "" FORCE)
 set(BuildTests OFF CACHE BOOL "" FORCE)
-set(IL_TESTS OFF CACHE BOOL "" FORCE)
-set(IL_BUILD_ILUT OFF CACHE BOOL "" FORCE)
-#todo tell IL to calm down and not parse everything
+
 
 #====================================================================
 #### Add External Dependencies ####
@@ -135,30 +129,11 @@ target_include_directories(enu_graphics_framework PRIVATE "lib/assimp/include")
 target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include")
 target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
 #================================================
-# libpng https://github.com/glennrp/libpng.git c1effe1bb
-add_subdirectory("lib/libpng")
-SET(PNG_INCLUDE_DIRS "lib/libpng" "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng" CACHE PATH "")
-target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/libpng")
-target_include_directories(png PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
-target_include_directories(pngfix PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
-target_include_directories(png-fix-itxt PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
-SET(PNG_LIBRARIES png CACHE STRING "")
-SET(IL_PNG_LIB ON CACHE BOOL "" FORCE)
-#================================================
-# libjpeg https://github.com/dooglz/libjpeg.git
-add_subdirectory("lib/libjpeg")
-SET(JPEG_INCLUDE_DIRS "lib/libjpeg" "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg" CACHE PATH "" FORCE)
-target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/libjpeg")
-SET(JPEG_LIBRARIES jpeg CACHE STRING "" FORCE)
-SET(IL_JPEG_LIB ON CACHE BOOL "" FORCE)
-#================================================
-# devil https://github.com/dooglz/DevIL.git
-add_subdirectory("lib/devil/DevIL")
-target_include_directories(enu_graphics_framework PRIVATE "lib/devil/DevIL/include")
-target_include_directories(IL PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libpng")
-target_include_directories(IL PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/lib/libjpeg")
-
-
+add_library(stb_image INTERFACE)
+target_include_directories(stb_image INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+target_sources(stb_image INTERFACE 
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/stb_image.h
+)
 #================================================
 # OpenGL
 FIND_PACKAGE( OpenGL REQUIRED)
@@ -173,16 +148,16 @@ target_link_libraries(enu_graphics_framework
 	PUBLIC ${OPENGL_gl_LIBRARY} 
 	PUBLIC glfw
 	PUBLIC libglew_shared
-	PRIVATE assimp 
-	PRIVATE ILU 
 	PRIVATE zlib
+  PRIVATE stb_image
+  PRIVATE assimp
 )
 #====================================================================
 set(junk 
-	pngfix png-fix-itxt IrrXML genfiles uninstall glm_dummy 
+	IrrXML uninstall glm_dummy 
 	UpdateAssimpLibsDebugSymbolsAndDLLs example zlibstatic minigzip
 )
-set(deps glfw zlib jpeg png IL ILU assimp libglew_shared)
+set(deps glfw zlib assimp libglew_shared)
 
 FOREACH(jnk ${junk})
 	#Hide junks in junk VS project folder
@@ -212,5 +187,6 @@ if(${ENU_GFX_TEST})
 			$<TARGET_FILE_DIR:framework_test>
 		)
 	ENDFOREACH()
+  #set_target_properties(framework_test PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "$(TargetDir)")
 endif()
 

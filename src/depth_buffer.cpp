@@ -2,8 +2,8 @@
 
 #include "depth_buffer.h"
 #include "util.h"
-#include <IL/il.h>
-#include <IL/ilu.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 
 namespace graphics_framework {
 // Creates a depth buffer object
@@ -21,7 +21,8 @@ depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...)
   }
 
   // Create the depth image data
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0,
+               GL_DEPTH_COMPONENT, GL_FLOAT, 0);
   // Check if error
   if (CHECK_GL_ERROR) {
     // Display error
@@ -36,7 +37,8 @@ depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, glm::value_ptr(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR,
+                   glm::value_ptr(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f)));
   CHECK_GL_ERROR; // Not considered fatal here
 
   // Create and set up the FBO
@@ -91,37 +93,40 @@ depth_buffer::depth_buffer(GLuint width, GLuint height) throw(...)
 // Saves the framebuffer
 void depth_buffer::save(const std::string &filename, const bool linear) const {
   // Allocate memory to read image data into
-
-  GLfloat *data = new GLfloat[(_width * _height)];
+  std::unique_ptr<unsigned char[]> data(new unsigned char[(_width * _height)]);
   // Bind the frame
   glBindFramebuffer(GL_FRAMEBUFFER, _buffer);
-  glPixelStorei(GL_PACK_ALIGNMENT, 4);
-  glReadPixels(0, 0, _width, _height, GL_DEPTH_COMPONENT, GL_FLOAT, data);
-  GLuint *udata = nullptr;
+  glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
   if (linear) {
-    glReadPixels(0, 0, _width, _height, GL_DEPTH_COMPONENT, GL_FLOAT, data);
-    udata = new GLuint[(_width * _height)];
+    // brings data in range of (min>0) - (max<1.0) to range 1 - 254. with
+    // 0->0, 1.0->255
+    std::unique_ptr<GLfloat[]> fdata(new GLfloat[(_width * _height)]);
+    glReadPixels(0, 0, _width, _height, GL_DEPTH_COMPONENT, GL_FLOAT,
+                 fdata.get());
     const double f = 1000.0;
     const double n = 0.1;
-    const double maxm = static_cast<double>(UINT_MAX);
+    float max = 0.0f; // will never be bigger than f;
+
     for (size_t i = 0; i < (_width * _height); i++) {
-      if (data[i] == 0.0f) {
-        udata[i] = 0;
-      } else if (data[i] == 1.0f) {
-        udata[i] = UINT_MAX;
+      if (fdata[i] != 0.0f && fdata[i] != 1.0f) {
+        fdata[i] = (2.0 * n) / (f + n - fdata[i] * (f - n));
+        max = std::max(max, fdata[i]);
+      }
+    }
+
+    for (size_t i = 0; i < (_width * _height); i++) {
+      if (fdata[i] == 0.0f) {
+        data[i] = 0;
+      } else if (fdata[i] == 1.0f) {
+        data[i] = 255;
       } else {
-        double dd = (2.0 * n) / (f + n - data[i] * (f - n));
-        // double dd = n / (data[i] + f);
-        // double dd = n + (-data[i] / (f - n));
-        // double dd = -1.0 * (-data[i] - n) * (f - n);
-        // double dd = (data[i] - (2.0 * f*n) / (n - f)) / ((n + f) / (n - f));
-        data[i] = dd;
-        udata[i] = static_cast<GLuint>(maxm / dd);
+        data[i] = static_cast<unsigned char>(254.0 * (fdata[i] / max));
       }
     }
   } else {
-    glReadPixels(0, 0, _width, _height, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, data);
+    glReadPixels(0, 0, _width, _height, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE,
+                 data.get());
   }
 
   if (CHECK_GL_ERROR) {
@@ -130,31 +135,14 @@ void depth_buffer::save(const std::string &filename, const bool linear) const {
     // Throw exception
     throw std::runtime_error("ERROR - Couldn't Read glReadPixel");
   }
-  // Create bitmap
-  ILuint ImgId = -1;
-  // Generate the main image name to use.
-  ilGenImages(1, &ImgId);
-  // Bind this image name.
-  ilBindImage(ImgId);
-  if (linear) {
-    ilTexImage(_width, _height, 0, 1, IL_LUMINANCE, IL_UNSIGNED_INT, udata);
-  } else {
-    ilTexImage(_width, _height, 0, 1, IL_LUMINANCE, IL_UNSIGNED_INT, data);
-  }
-  // ilSetData(data);
-  // Save image
-  auto ret = ilSave(IL_PNG, filename.c_str());
+  stbi_flip_vertically_on_write(1);
+  const auto ret =
+      stbi_write_bmp(filename.c_str(), _width, _height, 1, data.get());
   if (!ret) {
-    std::cerr << "ERROR - Can't save image (may already exist, I'm not allowed to overwrite)" << std::endl;
+    std::cerr << "ERROR - Can't save image" << std::endl;
   }
-  // Unload bitmap
-  ilDeleteImage(ImgId);
+
   // Unbind framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  // Delete allocated memory
-  delete[] data;
-  if (udata) {
-    delete[] udata;
-  }
 }
-}
+} // namespace graphics_framework

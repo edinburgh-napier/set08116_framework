@@ -2,7 +2,7 @@
 
 #include "renderer.h"
 #include "util.h"
-#include <IL/il.h>
+//#include <IL/il.h>
 
 namespace graphics_framework {
 float renderer::_clear_r;
@@ -160,14 +160,7 @@ bool renderer::initialise(const std::string &title, renderer::ScreenMode sm, uns
     return false;
   }
 
-  // Init DevIL
-  {
-    std::clog << "Loading DevIL Image Loader, Version: " << IL_VERSION << std::endl;
-    ilInit();
-    if (get_devil_error()) {
-      return false;
-    }
-  }
+
 
 #if defined(DEBUG) | defined(_DEBUG)
   SET_DEBUG;
@@ -341,9 +334,6 @@ void renderer::shutdown() {
   std::clog << "LOG - shutdown called on renderer" << std::endl;
   // Set running to false
   _instance->_running = false;
-  // Shutdown DevIL
-  ilShutDown();
-  get_devil_error();
   // Terminated GLFW
   glfwTerminate();
   // Log

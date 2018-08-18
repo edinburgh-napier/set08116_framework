@@ -17,6 +17,7 @@ texture tjpg;
 texture tmipped;
 target_camera cam;
 cubemap cube_map;
+shadow_map shadow;
 float theta = 0.0f;
 
 bool load_content() {
@@ -74,6 +75,7 @@ bool load_content() {
   auto aspect = static_cast<float>(renderer::get_screen_width()) /
                 static_cast<float>(renderer::get_screen_height());
   cam.set_projection(1.0472f, aspect, 2.414f, 1000.0f);
+  shadow = shadow_map(renderer::get_screen_width(), renderer::get_screen_height());
   return true;
 }
 
@@ -112,10 +114,19 @@ bool update(float delta_time) {
     cam.set_projection(1.0472f, aspect, 2.414f, 1000.0f);
   }
 
+  // Press s to save
+  if (glfwGetKey(renderer::get_window(), 'S') == GLFW_PRESS) {
+    shadow.buffer->save("tests.png");
+  }
+  if (glfwGetKey(renderer::get_window(), 'L') == GLFW_PRESS) {
+    shadow.buffer->save("testl.png",false);
+  }
+
   return true;
 }
 
-bool render() {
+
+bool do_render() {
   renderer::bind(eff);
   mat4 R;
   R = rotate(mat4(1.0f), theta, vec3(0.0f, 0.0f, 1.0f));
@@ -125,10 +136,10 @@ bool render() {
   auto MVP = P * V * M;
   // Set MVP matrix uniform
   glUniformMatrix4fv(eff.get_uniform_location("MVP"), // Location of uniform
-                     1,               // Number of values - 1 mat4
-                     GL_FALSE,        // Transpose the matrix?
-                     value_ptr(MVP)); // Pointer to matrix data
-                                      // Render geometry
+    1,               // Number of values - 1 mat4
+    GL_FALSE,        // Transpose the matrix?
+    value_ptr(MVP)); // Pointer to matrix data
+                     // Render geometry
   renderer::render(geom3);
 
   renderer::bind(teff);
@@ -137,20 +148,20 @@ bool render() {
   renderer::bind(tmipped, 2);
   glUniform1i(teff.get_uniform_location("tex"), 0);
   glUniformMatrix4fv(
-      teff.get_uniform_location("MVP"), 1, GL_FALSE,
-      value_ptr(P * V * translate(mat4(1.0), vec3(3.0f, -5.0f, -8.0f))));
+    teff.get_uniform_location("MVP"), 1, GL_FALSE,
+    value_ptr(P * V * translate(mat4(1.0), vec3(3.0f, -5.0f, -8.0f))));
   renderer::render(geom2);
   glUniform1i(teff.get_uniform_location("tex"), 1);
   glUniformMatrix4fv(
-      teff.get_uniform_location("MVP"), 1, GL_FALSE,
-      value_ptr(P * V * translate(mat4(1.0), vec3(-8.0f, -5.0f, -8.0f))));
+    teff.get_uniform_location("MVP"), 1, GL_FALSE,
+    value_ptr(P * V * translate(mat4(1.0), vec3(-8.0f, -5.0f, -8.0f))));
   renderer::render(geom2);
 
   glUniform1i(teff.get_uniform_location("tex"), 2);
   glUniformMatrix4fv(teff.get_uniform_location("MVP"), 1, GL_FALSE,
-                     value_ptr(P * V *
-                               translate(mat4(1.0), vec3(0, -10.0f, 0)) *
-                               scale(mat4(1.0), vec3(20.0f))));
+    value_ptr(P * V *
+      translate(mat4(1.0), vec3(0, -10.0f, 0)) *
+      scale(mat4(1.0), vec3(20.0f))));
   renderer::render(geom);
 
   glDepthMask(GL_FALSE);
@@ -159,13 +170,31 @@ bool render() {
   renderer::bind(sbeff);
   MVP = P * V * scale(mat4(1.0), vec3(100.0f));
   glUniformMatrix4fv(sbeff.get_uniform_location("MVP"), 1, GL_FALSE,
-                     value_ptr(MVP));
+    value_ptr(MVP));
   renderer::bind(cube_map, 0);
   glUniform1i(sbeff.get_uniform_location("cubemap"), 0);
   renderer::render(geom4);
 
   glEnable(GL_DEPTH_TEST);
   glDepthMask(GL_TRUE);
+  return true;
+}
+
+bool render() {
+  renderer::set_render_target(shadow);
+  // Clear depth buffer bit
+  glClear(GL_DEPTH_BUFFER_BIT);
+  // Set face cull mode to front
+  glCullFace(GL_FRONT);
+
+  do_render();
+
+  // Set render target back to the screen
+  renderer::set_render_target();
+  // Set face cull mode to back
+  glCullFace(GL_BACK);
+
+  do_render();
   return true;
 }
 

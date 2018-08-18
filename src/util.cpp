@@ -1,10 +1,10 @@
 #include "util.h"
 #include "stdafx.h"
-#include <IL/il.h>
-#include <IL/ilu.h>
+//#include <IL/il.h>
+//#include <IL/ilu.h>
 
 namespace graphics_framework {
-
+/*
 bool get_devil_error() {
   bool ret = false;
   ILenum error = ilGetError();
@@ -16,7 +16,7 @@ bool get_devil_error() {
     } while ((error = ilGetError()));
   }
   return ret;
-}
+}*/
 
 inline std::string get_severity(GLenum severity) {
   switch (severity) {
