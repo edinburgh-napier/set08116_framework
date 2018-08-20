@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.12)
 # Compiler flags
 if (MSVC)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /EHsc" CACHE INTERNAL "" FORCE)
@@ -34,83 +34,31 @@ option(glew-cmake_BUILD_SINGLE_CONTEXT "" ON)
 option(glew-cmake_BUILD_STATIC "" OFF)
 #GLM options
 option(GLM_DYNAMIC_LIBRARY_ENABLE "" OFF)
-option(GLM_TEST_ENABLE_FAST_MATH "" ON)
-option(GLM_TEST_ENABLE_LANG_EXTENSIONS "" ON)
-option(GLM_TEST_ENABLE_SIMD_AVX2 "" ON)
-option(GLM_TEST_ENABLE_SIMD_SSE3 "" ON)
+option(GLM_INSTALL_ENABLE "" OFF)
+option(GLM_TEST_ENABLE "" OFF)
 #ASSIMP
 option(ASSIMP_BUILD_ASSIMP_TOOLS "" OFF)
 option(ASSIMP_BUILD_TESTS "" OFF)
 set(LIBRARY_SUFFIX "" CACHE STRING "the suffix for the assimp windows library")
 set(ASSIMP_INSTALL_PDB OFF CACHE BOOL "" FORCE)
 set(ASSIMP_BUILD_ZLIB ON CACHE BOOL "" FORCE)
-
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_3DS_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_MD2_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_MD3_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_MD5_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_MDL_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
 #TODO: go back and enable this, submit bug report
 set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
 
-set(ASSIMP_BUILD_MDC_IMPORTER OFF CACHE BOOL "" FORCE)
-#set(ASSIMP_BUILD_3DS_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_AC_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ASE_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ASSBIN_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_ASSXML_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_B3D_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_BVH_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_COLLADA_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_DXF_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_CSM_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_HMP_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_IRRMESH_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_IRR_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_LWO_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_LWS_IMPORTER OFF CACHE BOOL "" FORCE)
-#set(ASSIMP_BUILD_MD2_IMPORTER OFF CACHE BOOL "" FORCE)
-#set(ASSIMP_BUILD_MD3_IMPORTER OFF CACHE BOOL "" FORCE)
-#set(ASSIMP_BUILD_MD5_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_MDC_IMPORTER OFF CACHE BOOL "" FORCE)
-#set(ASSIMP_BUILD_MDL_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_NFF_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_NDO_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_OFF_IMPORTER OFF CACHE BOOL "" FORCE)
-#set(ASSIMP_BUILD_OBJ_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_OGRE_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_OPENGEX_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_PLY_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_MS3D_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_COB_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_BLEND_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_IFC_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_XGL_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_FBX_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_Q3D_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_Q3BSP_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_RAW_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_SIB_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_SMD_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_STL_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_TERRAGEN_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_3D_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_X_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_GLTF_IMPORTER OFF CACHE BOOL "" FORCE)
-set(ASSIMP_BUILD_3MF_IMPORTER OFF CACHE BOOL "" FORCE)
 set(BuildTests OFF CACHE BOOL "" FORCE)
 
-
-#====================================================================
-#### Add External Dependencies ####
-# ZLIB https://github.com/madler/zlib cacf7f1
-add_subdirectory("lib/zlib")
-target_include_directories(enu_graphics_framework PRIVATE "lib/zlib")
-target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
-#link_directories("${CMAKE_BINARY_DIR}/lib/zlib")
-SET(ZLIB_FOUND 1)
-#This is for assimp
-SET(ZLIB_LIBRARIES zlib)
-#This is for libpng
-SET(ZLIB_LIBRARY zlib)
-SET(ZLIB_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/zlib/")
-set(PNG_BUILD_ZLIB ON CACHE BOOL "" FORCE)
 #================================================
+#### Add External Dependencies ####
+#================================================
+
 # GLFW https://github.com/glfw/glfw.git 56ecd62f
 add_subdirectory("lib/glfw")
 target_include_directories(enu_graphics_framework PUBLIC "lib/glfw/include/")
@@ -127,12 +75,12 @@ target_include_directories(enu_graphics_framework PUBLIC "lib/glm")
 add_subdirectory("lib/assimp")
 target_include_directories(enu_graphics_framework PRIVATE "lib/assimp/include")
 target_include_directories(enu_graphics_framework PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/assimp/include")
-target_include_directories(assimp PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/lib/zlib")
 #================================================
 add_library(stb_image INTERFACE)
 target_include_directories(stb_image INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 target_sources(stb_image INTERFACE 
   ${CMAKE_CURRENT_SOURCE_DIR}/lib/stb_image.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/lib/stb_image_write.h
 )
 #================================================
 # OpenGL
@@ -140,24 +88,20 @@ FIND_PACKAGE( OpenGL REQUIRED)
 if(NOT ${OPENGL_FOUND})
   message(FATAL_ERROR "OPENGL NOT FOUND")
 endif()
-
 #====================================================================
-
-
 target_link_libraries(enu_graphics_framework 
 	PUBLIC ${OPENGL_gl_LIBRARY} 
 	PUBLIC glfw
 	PUBLIC libglew_shared
-	PRIVATE zlib
   PRIVATE stb_image
   PRIVATE assimp
 )
 #====================================================================
 set(junk 
-	IrrXML uninstall glm_dummy 
-	UpdateAssimpLibsDebugSymbolsAndDLLs example zlibstatic minigzip
+	IrrXML uninstall 
+	UpdateAssimpLibsDebugSymbolsAndDLLs zlib zlibstatic glm_static glm_shared
 )
-set(deps glfw zlib assimp libglew_shared)
+set(deps glfw assimp libglew_shared)
 
 FOREACH(jnk ${junk})
 	#Hide junks in junk VS project folder
