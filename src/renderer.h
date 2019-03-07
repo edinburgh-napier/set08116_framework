@@ -101,8 +101,12 @@ public:
   static void bind(const std::vector<spot_light> &spots, const std::string &name) throw(...);
   // Renders a piece of geometry
   static void render(const geometry &geom) throw(...);
+  // Renders a piece of geometry as instancied array
+  static void render_instancieted(const geometry &geom, GLuint instancesNumber) throw(...);
   // Renders a mesh object
   static void render(const mesh &m) throw(...);
+  // Renders mesh object as instancied array
+  static void render_instancieted(const mesh & m, GLuint instancesNumber) throw(...);
   // Sets the render target of the renderer to the screen
   static void set_render_target() throw(...);
   // Sets the render target of the renderer to a shadow map

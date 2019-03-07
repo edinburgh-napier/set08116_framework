@@ -652,10 +652,86 @@ void renderer::render(const geometry &geom) throw(...) {
   }
 }
 
+
+// Renders a piece of geometry
+void renderer::render_instancieted(const geometry &geom, GLuint instancesNumber) throw(...) {
+	assert(geom.get_array_object() != 0);
+	// Check renderer is running
+	assert(_instance->_running);
+	// Bind the vertex array object for the
+	glBindVertexArray(geom.get_array_object());
+
+	// Check for any OpenGL errors
+	if (CHECK_GL_ERROR) {
+		// Display error
+		std::cerr << "ERROR - rendering geometry" << std::endl;
+		std::cerr << "Could not bind vertex array object" << std::endl;
+		// Throw exception
+		throw std::runtime_error("Error rendering geometry");
+	}
+	// If there is an index buffer then use to render
+	if (geom.get_idx_buffer() != 0) {
+		// Bind index buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geom.get_idx_buffer());
+		// Check for error
+		if (CHECK_GL_ERROR) {
+			std::cerr << "ERROR - rendering geometry" << std::endl;
+			std::cerr << "Could not bind index buffer" << std::endl;
+			// Throw exception
+			throw std::runtime_error("Error rendering geometry");
+		}
+		// Draw elements
+		glDrawElementsInstanced(geom.get_type(), geom.get_index_count(), GL_UNSIGNED_INT, 0, instancesNumber);
+		// Check for error
+		if (CHECK_GL_ERROR) {
+			// Display error
+			std::cerr << "ERROR - rendering geometry" << std::endl;
+			std::cerr << "Could not draw elements from indices" << std::endl;
+			// Throw exception
+			throw std::runtime_error("Error rendering geometry");
+		}
+	}
+	else {
+		// Draw arrays
+		glDrawArraysInstanced(geom.get_type(), 0, geom.get_vertex_count(), instancesNumber);
+		// Check for error
+		if (CHECK_GL_ERROR) {
+			std::cerr << "ERROR - rendering geometry" << std::endl;
+			std::cerr << "Could not draw arrays" << std::endl;
+			// Throw exception
+			throw std::runtime_error("Error rendering geometry");
+		}
+	}
+}
+
 // Renders a piece of geometry
 void renderer::render(const mesh &m) throw(...) {
   // Render geometry
   render(m.get_geometry());
+}
+
+// Renders a piece of geometry
+void renderer::render_instancieted(const mesh &m, GLuint instancesNumber) throw(...) {
+
+	// Enable the glVertexAttributeArray 5 to be overloaded as a matrix
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)0);
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(sizeof(glm::vec4)));
+	glEnableVertexAttribArray(7);
+	glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(2 * sizeof(glm::vec4)));
+	glEnableVertexAttribArray(8);
+	glVertexAttribPointer(8, 4, GL_FLOAT, GL_FALSE, sizeof(glm::mat4), (GLvoid*)(3 * sizeof(glm::vec4)));
+
+	glVertexAttribDivisor(5, 1);
+	glVertexAttribDivisor(6, 1);
+	glVertexAttribDivisor(7, 1);
+	glVertexAttribDivisor(8, 1);
+
+	glBindVertexArray(0);
+
+	// Render geometry
+	render_instancieted(m.get_geometry(), instancesNumber);
 }
 
 // Sets the render target of the renderer to the screen
